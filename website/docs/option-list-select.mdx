@@ -1,0 +1,48 @@
+---
+title: Option List Select
+---
+
+import Example from "@site/src/examples/option-list-select-mode";
+
+# Option List Select
+
+`OptionListSelect` renders the choices inline as radios or checkboxes.
+
+```tsx
+import { SuperSelect } from "super-select-react";
+import "super-select-react/style.css";
+
+<SuperSelect mode="option-list" name="person">
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+You can also use `OptionListSelect` directly:
+
+```tsx
+import { OptionListSelect } from "super-select-react";
+import "super-select-react/style.css";
+
+<OptionListSelect name="person">
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</OptionListSelect>
+```
+
+Use it when the available choices should stay visible on the page:
+
+- short to medium lists that benefit from direct comparison
+- settings screens
+- forms where the surrounding copy matters as much as the choices
+- places where an always-open list is more natural than a popup
+
+This mode still supports search, option sources, pagination, and the same loading, empty, and error states as the modal
+mode. The main difference is presentation: the list is part of the page instead of opening in a dialog.
+
+## Live Example
+
+<Example />
+

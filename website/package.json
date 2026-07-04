@@ -1,0 +1,63 @@
+{
+  "name": "website",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "sync:vendor-css": "node ./scripts/sync-vendor-css.mjs",
+    "docusaurus": "docusaurus",
+    "start": "docusaurus start",
+    "build": "npm run sync:vendor-css && docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "deploy": "docusaurus deploy",
+    "clear": "docusaurus clear",
+    "serve": "npm run sync:vendor-css && docusaurus serve",
+    "write-translations": "docusaurus write-translations",
+    "write-heading-ids": "docusaurus write-heading-ids",
+    "check": "npm run typecheck && npm run lint",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^3.36.0",
+    "@docusaurus/core": "3.10.1",
+    "@docusaurus/faster": "3.10.1",
+    "@docusaurus/preset-classic": "3.10.1",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mantine/core": "^9.4.1",
+    "@mantine/hooks": "^9.4.1",
+    "@mdx-js/react": "^3.1.1",
+    "@mui/material": "^9.1.2",
+    "antd": "^6.5.0",
+    "bootstrap": "^5.3.8",
+    "clsx": "^2.1.1",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "super-select-react": "file:.."
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "^3.10.1",
+    "@docusaurus/types": "^3.10.1",
+    "eslint": "^10.6.0",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "prettier": "^3.9.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 3 chrome version",
+      "last 3 firefox version",
+      "last 5 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0"
+  }
+}

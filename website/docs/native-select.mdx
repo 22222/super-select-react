@@ -1,0 +1,53 @@
+---
+title: Native Select
+---
+
+import Example from "@site/src/examples/native-select-mode";
+
+# Native Select
+
+Native mode renders a real browser `<select>`.
+
+```tsx
+import { SuperSelect } from "super-select-react";
+import "super-select-react/style.css";
+
+<SuperSelect mode="native" name="person">
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+It is useful when you explicitly want browser-native behavior, or when an existing form still depends on the browser
+control. For most new flows, one of the richer Super Select modes is usually easier to work with.
+
+There are a couple of practical limits to keep in mind:
+
+- it does not support pagination
+- desktop browser multiple-select UIs may be awkward compared to the other modes
+- the exact presentation depends on the browser and operating system
+
+When `mode="native"` is used with an `optionSource`, Super Select loads the first page and renders those options in the
+native control. Native mode does not provide option-source searching or load additional pages.
+
+Because of that, native mode is often best used behind a mode function. One common pattern is to fall back to the modal when the browser's native multiple-select UI is likely to be the desktop listbox version.
+
+```tsx
+<SuperSelect
+    optionSource={source}
+    mode={({ hasMore, multiple }) => {
+        if (hasMore) return "modal";
+        if (!multiple) return "native";
+
+        const supportsUsableNativeMultipleSelect =
+            /Android|iPhone|iPad/i.test(navigator.userAgent) &&
+            window.matchMedia("(pointer: coarse)").matches;
+        return supportsUsableNativeMultipleSelect ? "native" : "modal";
+    }}
+/>
+```
+
+## Live Example
+
+<Example />

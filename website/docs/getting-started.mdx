@@ -1,0 +1,181 @@
+---
+title: Getting Started
+---
+
+import Example from "@site/src/examples/getting-started";
+import HomeBasicExample from "@site/src/examples/home-basic";
+
+# Getting Started
+
+Install the package:
+
+```bash
+npm install super-select-react
+```
+
+Then render the `<SuperSelect>` component where you would normally render a `<select>`.
+
+```tsx
+import { SuperSelect } from "super-select-react";
+import "super-select-react/style.css";
+
+<SuperSelect>
+  <option value="" disabled hidden>Select an option</option>
+  <option value="1">Hello</option>
+  <option value="2">World!</option>
+  <option value="3">Three</option>
+</SuperSelect>
+```
+
+You should end up with something like this:
+
+<p>
+    <HomeBasicExample />
+</p>
+
+The component accepts normal select props and normal `<option>` or `<optgroup>` children. That means you can use the
+same patterns you already know:
+
+```tsx
+<SuperSelect
+    name="people"
+    multiple
+    required
+    defaultValue={["adrian-pennino", "apollo-creed"]}
+    onChange={(event) => {
+        const selectedValues = Array.from(event.currentTarget.selectedOptions).map((option) => option.value);
+        console.log(selectedValues);
+    }}
+>
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+If you want built-in styling, import the CSS file as in the above example. If you want to supply your own style, see
+[Customization](./customization). If you are using `SuperSelect` with a UI toolkit, see
+[UI Component Libraries](./ui-component-libraries) for guidance.
+
+## Examples
+
+Here are more examples of what a `SuperSelect` looks like in different states. Change the display mode to see the different UI options.
+
+<Example />
+
+## Option Sources
+
+For options loaded outside JSX children, pass an `optionSource`. The source is responsible for returning options in the
+shape Super Select uses: `{ value, label }`.
+
+```tsx
+import { createOptionSource, SuperSelect } from "super-select-react";
+
+const personSource = createOptionSource({
+    fetch: async ({ search = "", offset = 0, limit = 20, signal }) => {
+        const response = await fetch(
+            `/api/people?search=${encodeURIComponent(search)}&offset=${offset}&limit=${limit}`,
+            { signal },
+        );
+        const data = await response.json();
+        return {
+            options: data.items.map((person: { id: string; name: string }) => ({
+                value: person.id,
+                label: person.name,
+            })),
+            hasMore: data.hasMore,
+        };
+    },
+});
+
+<SuperSelect name="person" optionSource={personSource} />;
+```
+
+Keep the source instance stable in your component, usually with `useMemo`, so the control does not treat every render as
+a new data source.
+
+```tsx
+const personSource = useMemo(() => createOptionSource(fetchPeople), []);
+
+return <SuperSelect name="person" optionSource={personSource} />;
+```
+
+Option sources add loading, empty, pagination, and error states. See [Option Sources](./option-sources) for the full
+contract.
+
+## Value Change
+
+The normal `<select>` element's `onChange` event is supported and acts like the real thing:
+
+```tsx
+const [value, setValue] = React.useState<string>("");
+
+<SuperSelect
+    name="person"
+    value={value}
+    onChange={(event) => {
+        setValue(event.currentTarget.value);
+    }}
+>
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+```tsx
+const [values, setValues] = React.useState<string[]>([]);
+
+<SuperSelect
+    name="people"
+    multiple
+    value={values}
+    onChange={(event) => {
+        const selectedValues = Array.from(event.currentTarget.selectedOptions).map((option) => option.value);
+        setValues(selectedValues);
+    }}
+>
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+When you only need the selected value, `onValueChange` gives it to you directly without going through an event object:
+
+```tsx
+const [value, setValue] = React.useState<string>("");
+
+<SuperSelect
+    name="person"
+    value={value}
+    onValueChange={setValue}
+>
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+```tsx
+const [values, setValues] = React.useState<string[]>([]);
+
+<SuperSelect
+    name="people"
+    multiple
+    value={values}
+    onValueChange={setValues}
+>
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+## Customizing The UI
+
+Super Select is not tied to a UI framework. You can use the default CSS, adapt it to your own classes, or swap pieces of
+the rendered UI when you need a closer fit with your application.
+
+See [Customization](./customization) to style the control itself, or [UI Component Libraries](./ui-component-libraries)
+to wrap it with a framework like Bootstrap, Mantine, or Material UI.

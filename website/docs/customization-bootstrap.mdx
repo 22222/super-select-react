@@ -1,0 +1,36 @@
+---
+title: Bootstrap
+---
+
+import Example from "@site/src/examples/customization-bootstrap";
+import Head from "@docusaurus/Head";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+# Bootstrap
+
+<Head>
+    <link rel="stylesheet" href={useBaseUrl("/vendor/bootstrap.min.css")} />
+</Head>
+
+This library uses namespaced versions of standard bootstrap classes.  So you can use it with Bootstrap with minimal customization, mostly just removing the classNamePrefix:
+
+```tsx
+<SuperSelect
+    mode="modal"
+    customization={{
+        classNamePrefix: "",
+        modalSelectButton: {
+            selectedContent: { placeholder: "Select..." },
+        },
+    }}
+>
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+The live example uses a small `BootstrapSuperSelect` wrapper built from the same pattern. You can
+[view the source on GitHub](https://github.com/22222/super-select-react/blob/main/website/src/components/BootstrapSuperSelect.tsx).
+
+<Example />
+

@@ -1,0 +1,66 @@
+.super-select-story__page {
+    padding: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.super-select-story__card {
+    border: 1px solid #d7dde5;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: #fff;
+}
+
+.super-select-story__card-sm {
+    padding: 12px;
+}
+
+.super-select-story__card-title {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.super-select-story__card-title-sm {
+    font-size: 0.95rem;
+}
+
+.super-select-story__mt-8 {
+    margin-top: 8px;
+}
+
+.super-select-story__mb-8 {
+    margin-bottom: 8px;
+}
+
+.super-select-story__stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.super-select-story__form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.super-select-story__hidden-frame {
+    width: 0;
+    height: 0;
+    border: 0;
+    display: block;
+}
+
+.super-select-story__rich-native-select.super-select__form-select,
+.super-select-story__rich-native-select::picker(select) {
+    appearance: base-select;
+}
+
+.super-select-story__rich-native-select.super-select__form-select {
+    background-image: none;
+}
+
+.super-select-story__rich-native-select option {
+    align-items: center;
+}

@@ -1,0 +1,239 @@
+---
+title: Option Sources
+---
+
+import OptionSourcesExample from "@site/src/examples/option-sources";
+import GroupedAsyncExample from "@site/src/examples/grouped-async";
+import ErrorHandlingExample from "@site/src/examples/error-handling";
+
+# Option Sources
+
+Use `optionSource` when options come from somewhere other than local `<option>` children. The source might call an API,
+read IndexedDB, query a cache, or compute options from application state.
+
+Use `createOptionSource` to wrap the fetch logic for a select field. It gives Super Select one place to load the visible
+option list and resolve the labels of already-selected values.
+
+## Creating an Option Source
+
+An API-backed option source translates the request into the format expected by the endpoint:
+
+```tsx
+import { createOptionSource } from "super-select-react";
+
+const citySource = createOptionSource(async ({ values, search, offset, limit, after, signal }) => {
+    const response = await fetch("/api/cities/options", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ values, search, offset, limit, after: after?.value }),
+        signal,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Unable to load cities: ${response.status}`);
+    }
+
+    return response.json();
+});
+```
+
+An option source can also work directly with something like a local array:
+
+```tsx
+import { createOptionSource } from "super-select-react";
+
+const cities = [
+    { value: "austin", label: "Austin" },
+    { value: "chicago", label: "Chicago" },
+    { value: "seattle", label: "Seattle" },
+];
+
+const citySource = createOptionSource(async ({ values, search = "", offset = 0, limit = 100 }) => {
+    const normalizedSearch = search.trim().toLowerCase();
+    const matchingCities = cities.filter((city) => {
+        if (values) {
+            return values.includes(city.value);
+        }
+        return city.label.toLowerCase().includes(normalizedSearch);
+    });
+    return {
+        options: matchingCities.slice(offset, offset + limit),
+        hasMore: offset + limit < matchingCities.length,
+    };
+});
+```
+
+Pass the resulting source to `SuperSelect`:
+
+```tsx
+import { SuperSelect } from "super-select-react";
+
+const citySource = React.useMemo(...);
+<SuperSelect name="city" optionSource={citySource} />
+```
+
+<OptionSourcesExample />
+
+## Requests and Responses
+
+`createOptionSource` accepts an async function that Super Select calls for two kinds of requests:
+
+- Load a list of options, optionally filtered by a search term and paginated.
+- Resolve options for a set of values so their labels can be displayed when they are not in the default list of options.
+
+The function receives a request object that may contain:
+
+- `values`: The saved option values to resolve.
+- `search`: The current search text.
+- `limit`: The maximum number of options to return.
+- `offset`: The number of matching options to skip, for offset-based pagination.
+- `after`: The last option from the previous page, for cursor-based pagination.
+- `signal`: An `AbortSignal` that indicates when the request is no longer needed.
+
+The function returns a promise for an object containing:
+
+- `options`: An array of matching options. Each option requires `value` and `label`.
+- `hasMore` (optional): Whether another page of matching options is available.
+
+When a response has `hasMore: true`, Super Select can request another page. The next request advances `offset` by the
+number of options already returned and sets `after` to the last option from the previous page.
+
+For each query, the modal and option-list modes display the first page and allow up to two additional pages to be
+loaded. If more options are still available after that, the load-more action is replaced by an overflow indicator and
+the user can narrow the results with a search. Change the limit with `customization.maxAdditionalPages`.
+
+## Option Shape
+
+Source options use the same shape everywhere. Every option needs a submitted `value` and a user-facing `label`.
+
+```ts
+type Option = {
+    value: string;
+    label: string;
+    children?: React.ReactNode;
+    groupLabel?: string;
+    disabled?: boolean;
+    hidden?: boolean;
+    data?: unknown;
+};
+```
+
+Use `disabled` for options that should be visible but not selectable. Use `hidden` for options that should not appear in
+the rendered list. `data` is available when pagination, a custom search, or custom rendering needs extra metadata.
+
+Use `children` when the option should render richer content than the plain label. The label remains the plain-text
+representation used for search and anywhere the rich content cannot be rendered.
+
+### Grouped Options
+
+Use `groupLabel` when an option belongs under a group header. If your application stores options in groups, flatten them
+and copy the group label onto each option:
+
+```tsx
+const peopleByGroup = [
+    {
+        label: "Operations",
+        options: [
+            { value: "apollo-creed", label: "Apollo Creed" },
+            { value: "james-lang", label: "James Lang" },
+        ],
+    },
+    {
+        label: "Training",
+        options: [
+            { value: "michael-goldmill", label: "Michael Goldmill" },
+            { value: "tony-evers", label: "Tony Evers" },
+        ],
+    },
+    {
+        label: "Personal",
+        options: [
+            { value: "adrian-pennino", label: "Adrian Pennino" },
+            { value: "robert-balboa", label: "Robert Balboa" },
+        ],
+    },
+];
+const source = createOptionSource(async ({ values, search = "", offset = 0, limit = 100 }) => {
+    const normalizedSearch = search.trim().toLowerCase();
+    const matchingOptions = peopleByGroup
+        .flatMap((group) => group.options.map((option) => ({ ...option, groupLabel: group.label })))
+        .filter((option) =>
+            values ? values.includes(option.value) : option.label.toLowerCase().includes(normalizedSearch),
+        );
+    return {
+        options: matchingOptions.slice(offset, offset + limit),
+        hasMore: offset + limit < matchingOptions.length,
+    };
+});
+```
+
+<GroupedAsyncExample />
+
+
+## Caching
+
+Sources created with `createOptionSource` cache the first unfiltered page and options returned while resolving selected
+values. This avoids repeating common requests and allows selected values to reuse labels that have already been loaded.
+Search results and additional pages are still requested from the source when needed.
+
+Keep the source instance stable so its cache survives React renders. Define it outside the component when possible, or
+create it with `useMemo` when it depends on component state.
+
+Disable the built-in cache when the request layer already handles caching or the data must always be refreshed:
+
+```tsx
+const citySource = createOptionSource({
+    fetch: fetchCities,
+    noCache: true,
+});
+```
+
+Call `clearCache` after the underlying data changes and previously loaded options should be discarded:
+
+```tsx
+citySource.clearCache?.();
+```
+
+
+## Error Handling
+
+You can throw any kind of error from an option source. Super Select catches it and displays an error state with a retry
+button when the request can be repeated.
+
+Use `OptionSourceError` when the error needs a user-facing message or additional metadata:
+
+```tsx
+import { OptionSourceError } from "super-select-react";
+
+throw new OptionSourceError("403 Forbidden Internal Error Message", {
+    code: "forbidden",
+    httpStatus: 403,
+    userMessage: "You do not have permission to load cities.",
+});
+```
+
+The additional metadata properties available in an error are:
+
+- `userMessage` is displayed by the default error indicator.
+- `code` provides a consistent, machine-readable category for the failure.
+- `httpStatus` records an associated HTTP response and is used to derive a code when `code` is omitted.
+- `cause` preserves the original error for code that catches the option-source request directly.
+
+The optional `code` classifies the failure:
+
+| Code | Use when |
+| --- | --- |
+| `network` | The request could not reach its source. |
+| `timeout` | The request did not complete in time. |
+| `unauthorized` | Authentication is required or no longer valid. |
+| `forbidden` | The user is authenticated but does not have access. |
+| `not-found` | The requested endpoint or resource does not exist. |
+| `rate-limited` | The source rejected the request because too many requests were made. |
+| `server` | The source failed while processing the request. |
+
+The default error indicator displays `userMessage` but does not otherwise behave differently based on `code` or
+`httpStatus`. A custom error indicator component receives the complete error through its `error` prop and can use that
+metadata to choose its content or behavior. See [Customization](./customization) for information about replacing rendered
+components.
+
+<ErrorHandlingExample />

@@ -1,0 +1,52 @@
+---
+title: Modes
+---
+
+import ConfigurationModeResolutionExample from "@site/src/examples/configuration-mode-resolution";
+
+# Modes
+
+SuperSelect always uses the same option and value model, but it can render in several different ways. 
+The `mode` prop controls the presentation and interaction style of the select field:
+
+```tsx
+<SuperSelect mode="modal" />
+<SuperSelect mode="option-list" />
+<SuperSelect mode="toggle-button" />
+<SuperSelect mode="native" />
+```
+
+The modes are:
+
+- `modal` is the default. It is a good fit for longer lists, option sources, and mobile screens.
+- `option-list` shows the options inline as radios or checkboxes.
+- `toggle-button` renders local options as a compact button group.
+- `native` renders a real browser `<select>`.
+
+Each mode page has more detail and a live example.
+
+## Mode Resolution
+
+`mode` can also be a function. Use that when the right UI depends on the resolved option list. This is useful when
+small lists can stay native, inline, or toggle-based, while larger or paginated lists should use the modal picker.
+
+```tsx
+<SuperSelect
+    name="person"
+    optionSource={source}
+    mode={({ options, hasMore }) => (hasMore || options.length > 8 ? "modal" : "native")}
+/>
+```
+
+The mode function receives the loaded options, whether there is another page, and the select configuration that affects
+the mode decision, such as `multiple`.
+
+Mode resolution happens before the final mode is rendered. If the mode function needs options from an `optionSource`,
+`SuperSelect` loads the first page, resolves the mode, and then either passes the resolved options into the chosen mode
+or lets the chosen mode continue using the option source.
+
+<div data-testid="story-ready" className="super-select-story__page">
+    <ConfigurationModeResolutionExample />
+</div>
+
+

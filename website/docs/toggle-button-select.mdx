@@ -1,0 +1,61 @@
+---
+title: Toggle Button Select
+---
+
+import Example from "@site/src/examples/toggle-button-select-mode";
+
+# Toggle Button Select
+
+`ToggleButtonSelect` turns the options into a compact inline button group.
+
+```tsx
+import { SuperSelect } from "super-select-react";
+import "super-select-react/style.css";
+
+<SuperSelect mode="toggle-button" name="person">
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+You can also use `ToggleButtonSelect` directly:
+
+```tsx
+import { ToggleButtonSelect } from "super-select-react";
+import "super-select-react/style.css";
+
+<ToggleButtonSelect name="person">
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</ToggleButtonSelect>
+```
+
+It works best when:
+
+- the list is small
+- the option labels are short
+- the choices are local and stable
+- the select should read more like a segmented control than a picker
+
+This mode does **not** support pagination. Once the list is large enough to need paging, searching, or a lot of
+scrolling, one of the list or modal modes is a better fit.
+
+When `mode="toggle-button"` is used with an `optionSource`, Super Select loads the first page before rendering the
+buttons. Toggle-button mode does not provide option-source searching or load additional pages.
+
+Using a mode function is a good way to keep the toggle-button presentation for small local sets while falling back to a
+more scalable mode for everything else.
+
+```tsx
+<SuperSelect
+    optionSource={source}
+    mode={({ options, hasMore }) => (!hasMore && options.length < 10 ? "toggle-button" : "modal")}
+/>
+```
+
+## Live Example
+
+<Example />
+

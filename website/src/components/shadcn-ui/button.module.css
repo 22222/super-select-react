@@ -1,0 +1,41 @@
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.25rem;
+    border: 1px solid #d4d4d8;
+    border-radius: 0.375rem;
+    background: #18181b;
+    color: #fafafa;
+    font: inherit;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.default {
+    padding: 0 0.75rem;
+}
+
+.sm {
+    min-height: 2rem;
+    padding: 0 0.625rem;
+    font-size: 0.875rem;
+}
+
+.outline {
+    background: #fff;
+    color: #18181b;
+    border-color: #d4d4d8;
+}
+
+.ghost {
+    background: transparent;
+    color: inherit;
+    border-color: transparent;
+}

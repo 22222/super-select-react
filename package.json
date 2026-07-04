@@ -1,0 +1,100 @@
+{
+  "name": "super-select-react",
+  "private": false,
+  "version": "1.0.0",
+  "description": "An enhanced drop-in replacement for native select with a consistent experience across devices.",
+  "license": "MIT OR Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/22222/super-select-react.git"
+  },
+  "homepage": "https://22222.github.io/super-select-react/",
+  "bugs": {
+    "url": "https://github.com/22222/super-select-react/issues"
+  },
+  "keywords": [
+    "react",
+    "select",
+    "dropdown",
+    "modal",
+    "form",
+    "input",
+    "typescript"
+  ],
+  "type": "module",
+  "main": "./dist/super-select-react.cjs",
+  "module": "./dist/super-select-react.js",
+  "types": "./dist/super-select-react.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/super-select-react.d.ts",
+      "import": "./dist/super-select-react.js",
+      "require": "./dist/super-select-react.cjs"
+    },
+    "./style.css": "./dist/super-select-react.css"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "UNLICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@microsoft/api-extractor": "^7.58.9",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/eslint-plugin": "^1.6.20",
+    "eslint": "^10.6.0",
+    "eslint-plugin-playwright": "^2.10.4",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.4",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.1",
+    "vite": "^8.1.2",
+    "vite-plugin-dts": "^5.0.3",
+    "vitest": "^4.1.9"
+  },
+  "scripts": {
+    "start": "npm --prefix website run start",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test:visual": "playwright test --config playwright.visual.config.ts",
+    "test:visual:update": "playwright test --config playwright.visual.config.ts --update-snapshots",
+    "lint": "npm run lint:es && npm --prefix website run lint && npm run lint:prettier && npm run lint:line-endings",
+    "lint:es": "eslint src tests playwright.config.ts playwright.visual.config.ts vite.config.ts vitest.config.ts eslint.config.js",
+    "lint:fix": "npm run lint:es -- --fix && npm --prefix website run lint -- --fix && npm run prettier",
+    "lint:line-endings": "node scripts/check-line-endings.mjs",
+    "lint:prettier": "prettier --check .",
+    "build": "npm run build:vite && npm run build:tsc && npm run build:verify && npm run build:docs",
+    "build:vite": "vite build --configLoader runner",
+    "build:tsc": "tsc --project tsconfig.json --noEmit",
+    "build:verify": "node scripts/verify-build.mjs",
+    "build:docs": "npm --prefix website run build",
+    "prettier": "prettier --write .",
+    "setup": "npm run setup:npm && npm run setup:e2e",
+    "setup:npm": "npm install && npm --prefix website install",
+    "setup:e2e": "playwright install chromium",
+    "version": "node scripts/version.mjs",
+    "release": "npm run release:build && npm run release:publish",
+    "release:build": "npm run build:vite && npm run build:tsc && npm run build:verify",
+    "release:publish": "node scripts/publish.mjs"
+  }
+}

@@ -1,0 +1,97 @@
+---
+title: Super Select
+slug: /
+hide_title: true
+hide_table_of_contents: true
+---
+import HomeBasicExample from "@site/src/examples/home-basic";
+import Link from "@docusaurus/Link";
+
+<div className="super-select-docs__home-hero">
+    <h1 className="super-select-docs__home-title">Super Select</h1>
+    <p className="super-select-docs__home-tagline">
+        An enhanced drop-in replacement for native <code>&lt;select&gt;</code> with a consistent experience across devices.
+    </p>
+
+    <div className="super-select-docs__hero-actions">
+        <Link className="button button--primary button--lg" to="/getting-started">Read the Docs</Link>
+    </div>
+</div>
+
+----------
+
+Try it out:
+
+<p>
+    <HomeBasicExample />
+</p>
+
+----------
+
+## Enhanced
+
+The HTML `<select>` element is a good way to choose one or more values from a predefined list. It has clear semantics and
+works naturally with forms.
+
+Its limitations appear when that predefined list becomes large or dynamic, or when the browser's built-in presentation is
+not a good fit. Native selects expect their options to be rendered in the DOM, provide little support for loading or
+searching data, and offer limited control over how the field is presented.
+
+Super Select builds on the strengths of the native select while addressing those limitations. It can search and load
+options in pages, present the same field in several different ways, and adapt or replace the rendered UI. This allows the
+same selection model to work for both simple local lists and large data sets loaded as needed.
+
+----------
+
+## Drop-In Replacement
+
+Super Select accepts the same props as a native select. Values, default values, validation, change events, and form
+submission all work the same way. It also accepts normal `<option>` and `<optgroup>` children:
+
+```tsx
+<SuperSelect>
+  <option value="" disabled hidden>Select an option</option>
+  <option value="1">Hello</option>
+  <option value="2">World!</option>
+  <option value="3">Three</option>
+</SuperSelect>
+```
+
+Super Select adds just four custom props, all of which are optional:
+
+1. `optionSource` loads options from an API or other data source, with support for search, pagination, and selected value
+   resolution.
+2. `mode` displays the field as a modal picker, inline option list, set of toggle buttons, or native `<select>`.
+3. `onValueChange` provides the selected value directly as a simpler alternative to the native `onChange` event.
+4. `customization` allows you to modify or replace any part of the rendered UI.
+
+----------
+
+## Consistent Experience Across Devices
+
+Native selects look and behave differently across platforms, and multiple selects are especially awkward in most desktop
+browsers.
+
+Instead of switching between a browser dropdown, mobile picker, and desktop list box, Super Select provides a predictable
+interface designed for mouse, keyboard, and touch. Its values, events, and form behavior remain unchanged.
+
+----------
+
+## Where To Start
+
+<div className="super-select-docs__card-grid">
+    <Link className="super-select-docs__card" to="/getting-started">
+        <h3>Getting Started</h3>
+        <p>Install the package, render a field, and choose a mode.</p>
+    </Link>
+
+    <Link className="super-select-docs__card" to="/option-sources">
+        <h3>Option Sources</h3>
+        <p>Load options from an API or other data source.</p>
+    </Link>
+
+    <Link className="super-select-docs__card" to="/customization">
+        <h3>Customization</h3>
+        <p>Keep the defaults, bring your own classes, or replace rendered components.</p>
+    </Link>
+</div>

@@ -1,0 +1,61 @@
+---
+title: Mantine
+---
+
+import Example from "@site/src/examples/customization-mantine";
+import Head from "@docusaurus/Head";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+# Mantine
+
+<Head>
+    <link rel="stylesheet" href={useBaseUrl("/vendor/mantine-core.css")} />
+</Head>
+
+This example shows one way to define a Mantine-flavored wrapper around `SuperSelect`.
+
+```tsx
+export function MantineSuperSelect(props) {
+    return (
+        <SuperSelect
+            {...props}
+            customization={{
+                classNamePrefix: "mantine-super-select",
+                modalSelectButton: {
+                    component: MantineSelectButton,
+                    selectedContent: {
+                        component: MantineSelectedContent,
+                    },
+                },
+                modal: {
+                    component: MantineModalDialog,
+                    okButton: {
+                        component: MantineOkButton,
+                    },
+                },
+                optionList: {
+                    component: MantineOptionListContainer,
+                },
+                optionListInput: {
+                    component: MantineOptionListInput,
+                },
+                searchInput: {
+                    component: MantineSearchInput,
+                    placeholder: "Search options",
+                },
+                toggleButtonInput: {
+                    component: MantineToggleButtonInput,
+                },
+                selectInput: {
+                    component: MantineNativeSelect,
+                },
+            }}
+        />
+    );
+}
+```
+
+See [website/src/components/MantineSuperSelect.tsx](https://github.com/22222/super-select-react/blob/main/website/src/components/MantineSuperSelect.tsx) for the full source code of this example:
+
+<Example />
+

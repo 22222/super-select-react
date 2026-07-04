@@ -1,0 +1,50 @@
+---
+title: Chakra UI
+---
+
+import Example from "@site/src/examples/customization-chakra-ui";
+
+# Chakra UI
+
+This example shows one way to define a Chakra-flavored wrapper around `SuperSelect`.
+
+```tsx
+export function ChakraSuperSelect(props) {
+    return (
+        <SuperSelect
+            {...props}
+            customization={{
+                classNamePrefix: "chakra-super-select",
+                modalSelectButton: {
+                    component: ChakraSelectButton,
+                    selectedContent: {
+                        component: ChakraSelectedContent,
+                        placeholder: "\u200B",
+                    },
+                },
+                modal: {
+                    component: ChakraModalDialog,
+                    okButton: {
+                        component: ChakraOkButton,
+                    },
+                },
+                searchInput: {
+                    component: ChakraSearchInput,
+                    placeholder: "Search options",
+                },
+                optionListInput: {
+                    component: ChakraOptionListInput,
+                },
+                toggleButtonInput: {
+                    component: ChakraToggleButtonInput,
+                },
+            }}
+        />
+    );
+}
+```
+
+See [website/src/components/ChakraSuperSelect.tsx](https://github.com/22222/super-select-react/blob/main/website/src/components/ChakraSuperSelect.tsx) for the full source code of this example:
+
+<Example />
+

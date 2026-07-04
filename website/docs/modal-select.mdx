@@ -1,0 +1,51 @@
+---
+title: Modal Select
+---
+
+import Example from "@site/src/examples/modal-select-mode";
+
+# Modal Select
+
+`ModalSelect` is the default mode. The field stays compact in the form, then opens a searchable picker when the user
+needs to browse the options.
+
+```tsx
+import { SuperSelect } from "super-select-react";
+import "super-select-react/style.css";
+
+<SuperSelect mode="modal" name="person">
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+You can also use `ModalSelect` directly:
+
+```tsx
+import { ModalSelect } from "super-select-react";
+import "super-select-react/style.css";
+
+<ModalSelect name="person">
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</ModalSelect>
+```
+
+It is usually the best fit when:
+
+- the list might grow
+- options come from an asynchronous source
+- the same field needs to work well on phones and larger screens
+- you want search, loading states, pagination, and error handling in one place
+
+This mode is designed around the idea that browsing options and filling out a form are two different tasks. Keeping the
+field compact in the form lets the list itself use the full modal surface when it needs more room.
+
+For option sources, `ModalSelect` also supports pagination and "load more" flows directly.
+
+## Live Example
+
+<Example />
+

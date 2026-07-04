@@ -1,0 +1,47 @@
+---
+title: Ant Design
+---
+
+import Example from "@site/src/examples/customization-ant-design";
+
+# Ant Design
+
+This example shows one way to define an Ant Design-flavored wrapper around `SuperSelect`.
+
+```tsx
+export function AntdSuperSelect(props) {
+    return (
+        <SuperSelect
+            {...props}
+            customization={{
+                classNamePrefix: "antd-super-select",
+                modalSelectButton: {
+                    component: AntdSelectButton,
+                    selectedContent: {
+                        component: AntdSelectedContent,
+                        placeholder: "\u200B",
+                    },
+                },
+                modal: {
+                    component: AntdModalDialog,
+                },
+                searchInput: {
+                    component: AntdSearchInput,
+                    placeholder: "Search options",
+                },
+                optionListInput: {
+                    component: AntdOptionListInput,
+                },
+                toggleButtonInput: {
+                    component: AntdToggleButtonInput,
+                },
+            }}
+        />
+    );
+}
+```
+
+See [website/src/components/AntdSuperSelect.tsx](https://github.com/22222/super-select-react/blob/main/website/src/components/AntdSuperSelect.tsx) for the full source code of this example:
+
+<Example />
+
