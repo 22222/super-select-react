@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "super-select-react": ["../src/index.ts"],
+      "@chakra-ui/react": ["./node_modules/@chakra-ui/react"],
+      "@mantine/core": ["./node_modules/@mantine/core"],
+      "@mui/material": ["./node_modules/@mui/material"],
+      "@mui/material/*": ["./node_modules/@mui/material/*"],
+      "antd": ["./node_modules/antd"],
+      "react": ["./node_modules/@types/react/index.d.ts"],
+      "react/jsx-runtime": ["./node_modules/@types/react/jsx-runtime.d.ts"],
+      "react-dom": ["./node_modules/@types/react-dom/index.d.ts"]
+    },
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "types": ["node", "@docusaurus/module-type-aliases"]
+  },
+  "include": ["src"]
+}

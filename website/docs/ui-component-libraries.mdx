@@ -1,0 +1,49 @@
+---
+title: UI Component Libraries
+---
+
+# UI Component Libraries
+
+`SuperSelect` can be wrapped with components from the UI library your app already uses. The usual pattern is to make one
+small wrapper component, pass normal `SuperSelect` props through, and provide a `customization` object inside the wrapper.
+
+```tsx
+export function AppSuperSelect(props) {
+    return (
+        <SuperSelect
+            {...props}
+            customization={{
+                modalSelectButton: {
+                    component: AppSelectButton,
+                    selectedContent: {
+                        component: AppSelectedContent,
+                    },
+                },
+                modal: {
+                    component: AppModalDialog,
+                },
+                searchInput: {
+                    component: AppSearchInput,
+                },
+                optionListInput: {
+                    component: AppOptionListInput,
+                },
+                toggleButtonInput: {
+                    component: AppToggleButtonInput,
+                },
+            }}
+        />
+    );
+}
+```
+
+That wrapper gives the rest of your app a normal select-like component while keeping the framework-specific code in one place.
+
+The examples in this section show the same idea with a few common libraries:
+
+- [Bootstrap](./customization-bootstrap)
+- [Ant Design](./customization-ant-design)
+- [Chakra UI](./customization-chakra-ui)
+- [Mantine](./customization-mantine)
+- [Material UI](./customization-material-ui)
+- [shadcn/ui](./customization-shadcn-ui)

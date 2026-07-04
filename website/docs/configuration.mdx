@@ -1,0 +1,154 @@
+---
+title: Configuration
+---
+
+import ConfigurationPropsExample from "@site/src/examples/configuration-props";
+import UncontrolledFormExample from "@site/src/examples/form-behavior-uncontrolled";
+import ControlledFormExample from "@site/src/examples/form-behavior-controlled";
+import PlaceholderExample from "@site/src/examples/placeholder";
+import RichOptionContentExample from "@site/src/examples/rich-option-content";
+
+# Configuration
+
+Most `SuperSelect` configuration is just normal select configuration: `name`, `multiple`, `required`, `disabled`,
+`value`, `defaultValue`, and event handlers. Those props keep the same meaning across modes.
+
+## Props And Attributes
+
+Use standard select props to control interaction states, form behavior, and event handling.
+
+```tsx
+<SuperSelect
+    name="person"
+    required
+    disabled={false}
+    onChange={handleChange}
+    onFocus={handleFocus}
+    onBlur={handleBlur}
+>
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+<div data-testid="story-ready" className="super-select-story__page">
+    <ConfigurationPropsExample />
+</div>
+
+## Placeholder Options
+
+Placeholders work just like in a normal `<select>` element.  Use a disabled, hidden option with an empty value when you want placeholder text:
+
+```tsx
+<SuperSelect name="person" defaultValue="" required>
+    <option value="" disabled hidden>Select an option</option>
+    <option value="apollo-creed">Apollo Creed</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+</SuperSelect>
+```
+
+You can still use a placeholder option when the real options come from an `optionSource`:
+
+```tsx
+<SuperSelect name="person" optionSource={optionSource}>
+    <option value="" disabled hidden>Select an option</option>
+</SuperSelect>
+```
+
+<PlaceholderExample />
+
+## Rich Option Content
+
+The `appearance: base-select` style and the `<selectedcontent>` element allow native `<select>` options to contain rich content
+instead of plain text alone. SuperSelect supports the same rich option content in every mode.
+
+```tsx
+<SuperSelect name="color">
+    <button>{createElement("selectedcontent")}</button>
+    <option value="ocean-blue">
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.75rem" }}>
+            <span aria-hidden="true" style={{ width: 20, height: 20, backgroundColor: "#2563eb" }} />
+            <span>
+                <strong>Ocean Blue</strong> <code>#2563EB</code>
+            </span>
+        </span>
+    </option>
+    <option value="emerald">
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.75rem" }}>
+            <span aria-hidden="true" style={{ width: 20, height: 20, backgroundColor: "#059669" }} />
+            <span>
+                <strong>Emerald</strong> <code>#059669</code>
+            </span>
+        </span>
+    </option>
+</SuperSelect>
+```
+
+<RichOptionContentExample />
+
+
+## Form Behavior
+
+`SuperSelect` follows normal `<select>` form behavior across modes. A modal picker, inline option list, toggle button
+group, and native select should still behave like the same field from the form's point of view.
+
+- `name` controls submission keys
+- `multiple` submits repeated values under the same name
+- `required` works across modes
+- `value`, `defaultValue`, and `onChange` support controlled and uncontrolled React patterns
+
+Use `SuperSelect` like a native form field and let the browser submit the form:
+
+```tsx
+<form method="post" action="/signup">
+    <SuperSelect name="person" required defaultValue="apollo-creed">
+        <option value="robert-balboa">Robert Balboa</option>
+        <option value="apollo-creed">Apollo Creed</option>
+    </SuperSelect>
+    <button type="submit">Submit</button>
+</form>
+```
+
+For `multiple`, submitted form data contains repeated values under the same name, matching native multiple-select
+behavior.
+
+<UncontrolledFormExample />
+
+Use controlled values when your app owns the selected value in React state. For a single select, read
+`event.currentTarget.value`. For a multiple select, read `event.currentTarget.selectedOptions`, just like you would with
+a native `<select multiple>`.
+
+```tsx
+function ControlledExample() {
+    const [singleValue, setSingleValue] = useState("apollo-creed");
+    const [multiValue, setMultiValue] = useState(["apollo-creed", "adrian-pennino"]);
+
+    return (
+        <form>
+            <SuperSelect name="person" value={singleValue} onChange={(event) => setSingleValue(event.currentTarget.value)}>
+                <option value="robert-balboa">Robert Balboa</option>
+                <option value="apollo-creed">Apollo Creed</option>
+            </SuperSelect>
+
+            <SuperSelect
+                name="people"
+                multiple
+                value={multiValue}
+                onChange={(event) => {
+                    setMultiValue(Array.from(event.currentTarget.selectedOptions, (option) => option.value));
+                }}
+            >
+                <option value="robert-balboa">Robert Balboa</option>
+                <option value="adrian-pennino">Adrian Pennino</option>
+                <option value="apollo-creed">Apollo Creed</option>
+            </SuperSelect>
+        </form>
+    );
+}
+```
+
+`onValueChange` is available when you want the selected value directly instead of reading it from the change event. It
+does not replace `onChange`; it is just a convenience for React state.
+
+<ControlledFormExample />

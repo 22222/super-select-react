@@ -1,0 +1,39 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: monthly
+    groups:
+      root-dependencies:
+        patterns:
+          - "*"
+    ignore:
+      - dependency-name: react
+      - dependency-name: react-dom
+
+  - package-ecosystem: npm
+    directory: "/website"
+    schedule:
+      interval: monthly
+    groups:
+      website-dependencies:
+        patterns:
+          - "*"
+    ignore:
+      - dependency-name: react
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: react-dom
+        update-types:
+          - "version-update:semver-major"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - "*"

@@ -1,0 +1,10 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .star { fill:#A5D66F; stroke:#2F7D32; stroke-width:18; stroke-linejoin:round; stroke-linecap:round; }
+      .arrow { fill:#2F7D32; }
+    </style>
+  </defs>
+  <path class="star" d="m 256,62 L 313,178 L 441,197 L 349,287 L 371,414 L 256,354 L 141,414 L 163,287 L 71,197 L 199,178 Z"/>
+  <path class="arrow" d="m 192,222 h 128 L 256,286 Z"/>
+</svg>

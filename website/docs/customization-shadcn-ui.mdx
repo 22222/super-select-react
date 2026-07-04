@@ -1,0 +1,50 @@
+---
+title: shadcn/ui
+---
+
+import Example from "@site/src/examples/customization-shadcn-ui";
+
+# shadcn/ui
+
+This example shows one way to define a shadcn/ui-style wrapper around `SuperSelect`.
+
+```tsx
+export function ShadcnSuperSelect(props) {
+    return (
+        <SuperSelect
+            {...props}
+            customization={{
+                classNamePrefix: "",
+                modalSelectButton: {
+                    component: ShadcnSelectButton,
+                    selectedContent: {
+                        component: ShadcnSelectedContent,
+                        placeholder: "\u200B",
+                    },
+                },
+                modal: {
+                    component: ShadcnModalDialog,
+                },
+                searchInput: {
+                    component: ShadcnSearchInput,
+                    placeholder: "Search options",
+                },
+                optionListInput: {
+                    component: ShadcnOptionListInput,
+                },
+                toggleButtonInput: {
+                    component: ShadcnToggleButtonInput,
+                },
+                errorIndicator: {
+                    component: ShadcnErrorIndicator,
+                },
+            }}
+        />
+    );
+}
+```
+
+See [website/src/components/shadcn-ui/ShadcnSuperSelect.tsx](https://github.com/22222/super-select-react/blob/main/website/src/components/shadcn-ui/ShadcnSuperSelect.tsx) for the full source code of this example:
+
+<Example />
+

@@ -1,0 +1,84 @@
+---
+title: Accessibility
+---
+
+import RightToLeftExample from "@site/src/examples/right-to-left";
+
+# Accessibility
+
+Super Select uses native buttons, dialogs, radio buttons, checkboxes, and select elements for its default components.
+This preserves familiar browser behavior while allowing the same field to use different presentations.
+
+## Accessible Names
+
+Give each select an accessible name with `aria-label` or `aria-labelledby`. Use `aria-labelledby` when visible text
+already identifies the field:
+
+```tsx
+<span id="person-label">Person</span>
+<SuperSelect name="person" aria-labelledby="person-label">
+    <option value="robert-balboa">Robert Balboa</option>
+    <option value="adrian-pennino">Adrian Pennino</option>
+    <option value="apollo-creed">Apollo Creed</option>
+</SuperSelect>
+```
+
+These attributes are passed to the control used by the selected mode. The modal mode also uses the same naming
+information for its dialog.
+
+## Language And Text
+
+Super Select does not include language-specific text in its default UI. Option labels and other application content are
+rendered as provided, while default status and action controls use symbols instead of built-in English text.
+
+Applications should provide localized text wherever the meaning of a control or state would otherwise be unclear. This
+can include selected-value and search placeholders, loading text, empty and error messages, retry and pagination
+actions, and modal buttons. An `OptionSourceError` can provide a localized `userMessage` for errors returned by an
+option source.
+
+Use [customization](./customization) to provide this content. When a default control is represented only by a symbol,
+provide descriptive content or a title so its purpose is available to people using assistive technology.
+
+## Right-To-Left Layouts
+
+Use the standard `dir` prop when a select should use a right-to-left layout. It can also inherit direction from an
+ancestor with `dir="rtl"`. Set `lang` separately so browsers and assistive technology know the language of its content.
+
+```tsx
+<SuperSelect name="city" dir="rtl" lang="ar">
+    <option value="cairo">القاهرة</option>
+    <option value="dubai">دبي</option>
+    <option value="beirut">بيروت</option>
+</SuperSelect>
+```
+
+<RightToLeftExample />
+
+## Keyboard Interaction
+
+The default components use native form controls, so their standard keyboard behavior still applies:
+
+- `Tab` moves through the available controls.
+- Arrow keys move between radio buttons and select a new value.
+- `Space` toggles a focused checkbox.
+- Native mode follows the browser's `<select>` keyboard behavior.
+
+The modal mode adds the behavior needed to move between the trigger, search input, and option list:
+
+- `Enter` or `Space` opens the modal from its trigger button.
+- Focus moves to the search input when the modal opens.
+- `Arrow Down` and `Arrow Up` move from the search input to the first or last available option.
+- Arrow keys within a single-select option list change the selection without closing the modal.
+- Pressing `Space` to select an option closes a single select. A multiple select remains open so more values can be
+  changed.
+- `Escape` closes the modal without submitting a containing form.
+- `Enter` in the search input does not submit a containing form.
+
+## States
+
+Standard props such as `disabled` and `required` retain their form behavior in every mode. The default components also
+communicate relevant state through attributes such as `aria-disabled`, `aria-expanded`, `aria-busy`, and
+`aria-invalid`.
+
+Pending indicators use `role="status"`. Error, empty, and retry content can be supplied through
+[customization](./customization) when an application needs more descriptive text.
