@@ -8,11 +8,9 @@ const sidebarPath = fileURLToPath(new URL("./sidebars.js", import.meta.url));
 const websiteCustomCssPath = fileURLToPath(new URL("./src/css/custom.css", import.meta.url));
 const githubRepository = process.env.GITHUB_REPOSITORY ?? "";
 const [githubOwner = "super-select", githubRepositoryName = "super-select"] = githubRepository.split("/");
-const defaultPagesUrl = `https://${githubOwner}.github.io`;
 const defaultLocalUrl = "http://127.0.0.1";
-const defaultPagesBaseUrl = process.env.GITHUB_ACTIONS ? `/${githubRepositoryName}/` : "/";
-const siteUrl = process.env.DOCS_SITE_URL ?? (process.env.GITHUB_ACTIONS ? defaultPagesUrl : defaultLocalUrl);
-const baseUrl = process.env.DOCS_BASE_URL ?? defaultPagesBaseUrl;
+const siteUrl = process.env.DOCS_SITE_URL ?? defaultLocalUrl;
+const baseUrl = process.env.DOCS_BASE_URL ?? "/";
 
 const config: Config = {
     title: "Super Select",
