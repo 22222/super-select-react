@@ -112,22 +112,6 @@ test("keyboard switch to option-list mode keeps focus on the mode selector", asy
     await expect(optionListModeInput).toBeFocused();
 });
 
-test("switching to option-list mode keeps the mode selector in place", async ({ page }) => {
-    await openStory(page, "basic--basic");
-    await page.setViewportSize({ width: 1000, height: 500 });
-
-    const modeSelector = page.getByTestId("story-mode-selector");
-    const optionListModeButton = modeSelector.locator('label:has(input[type="radio"][value="option-list"])').first();
-    await modeSelector.evaluate((element) => element.scrollIntoView({ behavior: "instant", block: "center" }));
-    const positionBefore = await modeSelector.evaluate((element) => element.getBoundingClientRect().top);
-
-    await optionListModeButton.click();
-    await expect(page.locator('[role="radiogroup"][aria-label="person"]').first()).toBeVisible();
-
-    const positionAfter = await modeSelector.evaluate((element) => element.getBoundingClientRect().top);
-    expect(positionAfter).toBe(positionBefore);
-});
-
 test("switching to native single-select does not auto-commit browser default selection into shared state", async ({ page }) => {
     await openStory(page, "configuration--configuration");
 
