@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { createOptionSource, SuperSelect, type SuperSelectMode } from "super-select-react";
+import { useState } from "react";
+import { SuperSelect, type SuperSelectMode, useOptionSource } from "super-select-react";
 
 import { ModeSelector } from "./ModeSelector";
 
@@ -18,30 +18,26 @@ export default function FormBehaviorE2EExample() {
     const [toggleMultiSubmitCount, setToggleMultiSubmitCount] = useState(0);
     const [toggleMultiPayload, setToggleMultiPayload] = useState("");
 
-    const paginatedSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ offset = 0, limit = 5 }) => {
-                    const options = [
-                        { value: "austin", label: "Austin" },
-                        { value: "boston", label: "Boston" },
-                        { value: "chicago", label: "Chicago" },
-                        { value: "dallas", label: "Dallas" },
-                        { value: "denver", label: "Denver" },
-                        { value: "el-paso", label: "El Paso" },
-                        { value: "houston", label: "Houston" },
-                        { value: "san-antonio", label: "San Antonio" },
-                        { value: "san-diego", label: "San Diego" },
-                    ];
+    const paginatedSource = useOptionSource({
+        fetch: async ({ offset = 0, limit = 5 }) => {
+            const options = [
+                { value: "austin", label: "Austin" },
+                { value: "boston", label: "Boston" },
+                { value: "chicago", label: "Chicago" },
+                { value: "dallas", label: "Dallas" },
+                { value: "denver", label: "Denver" },
+                { value: "el-paso", label: "El Paso" },
+                { value: "houston", label: "Houston" },
+                { value: "san-antonio", label: "San Antonio" },
+                { value: "san-diego", label: "San Diego" },
+            ];
 
-                    return {
-                        options: options.slice(offset, offset + limit),
-                        hasMore: offset + limit < options.length,
-                    };
-                },
-            }),
-        [],
-    );
+            return {
+                options: options.slice(offset, offset + limit),
+                hasMore: offset + limit < options.length,
+            };
+        },
+    });
 
     return (
         <div className="super-select-story__page" data-testid="story-ready">

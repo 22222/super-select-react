@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { createOptionSource, SuperSelect, type SuperSelectMode } from "super-select-react";
+import { useState } from "react";
+import { SuperSelect, type SuperSelectMode, useOptionSource } from "super-select-react";
 
 import { ModeSelector } from "./ModeSelector";
 
@@ -7,26 +7,22 @@ export default function Example() {
     const [mode, setMode] = useState<SuperSelectMode | undefined>(undefined);
     const [submittedValues, setSubmittedValues] = useState("");
 
-    const citySource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ offset = 0, limit = 5 }) => {
-                    const options = [
-                        { value: "austin", label: "Austin" },
-                        { value: "boston", label: "Boston" },
-                        { value: "chicago", label: "Chicago" },
-                        { value: "dallas", label: "Dallas" },
-                        { value: "houston", label: "Houston" },
-                        { value: "seattle", label: "Seattle" },
-                    ];
-                    return {
-                        options: options.slice(offset, offset + limit),
-                        hasMore: offset + limit < options.length,
-                    };
-                },
-            }),
-        [],
-    );
+    const citySource = useOptionSource({
+        fetch: async ({ offset = 0, limit = 5 }) => {
+            const options = [
+                { value: "austin", label: "Austin" },
+                { value: "boston", label: "Boston" },
+                { value: "chicago", label: "Chicago" },
+                { value: "dallas", label: "Dallas" },
+                { value: "houston", label: "Houston" },
+                { value: "seattle", label: "Seattle" },
+            ];
+            return {
+                options: options.slice(offset, offset + limit),
+                hasMore: offset + limit < options.length,
+            };
+        },
+    });
 
     return (
         <div className="super-select-story__page" data-testid="story-ready">

@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { createOptionSource, SuperSelect, type SuperSelectMode } from "super-select-react";
+import { useState } from "react";
+import { SuperSelect, type SuperSelectMode, useOptionSource } from "super-select-react";
 
 import { ModeSelector } from "./ModeSelector";
 
@@ -29,21 +29,17 @@ const peopleByGroup = [
 
 export default function Example() {
     const [mode, setMode] = useState<SuperSelectMode | undefined>(undefined);
-    const source = useMemo(
-        () =>
-            createOptionSource(async ({ values, search = "", offset = 0, limit = 100 }) => {
-                const normalizedSearch = search.trim().toLowerCase();
-                const matchingOptions = peopleByGroup
-                    .flatMap((group) => group.options.map((option) => ({ ...option, groupLabel: group.label })))
-                    .filter((option) => (values ? values.includes(option.value) : option.label.toLowerCase().includes(normalizedSearch)));
+    const source = useOptionSource(async ({ values, search = "", offset = 0, limit = 100 }) => {
+        const normalizedSearch = search.trim().toLowerCase();
+        const matchingOptions = peopleByGroup
+            .flatMap((group) => group.options.map((option) => ({ ...option, groupLabel: group.label })))
+            .filter((option) => (values ? values.includes(option.value) : option.label.toLowerCase().includes(normalizedSearch)));
 
-                return {
-                    options: matchingOptions.slice(offset, offset + limit),
-                    hasMore: offset + limit < matchingOptions.length,
-                };
-            }),
-        [],
-    );
+        return {
+            options: matchingOptions.slice(offset, offset + limit),
+            hasMore: offset + limit < matchingOptions.length,
+        };
+    });
 
     return (
         <div className="super-select-story__page" data-testid="story-ready">

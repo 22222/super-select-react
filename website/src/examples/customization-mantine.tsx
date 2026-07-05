@@ -1,6 +1,6 @@
 import { Button, MantineProvider, Modal } from "@mantine/core";
-import { useMemo, useState } from "react";
-import { createOptionSource, type SuperSelectMode } from "super-select-react";
+import { useState } from "react";
+import { type SuperSelectMode, useOptionSource } from "super-select-react";
 
 import { MantineSuperSelect } from "../components/MantineSuperSelect";
 import { ModeSelector } from "./ModeSelector";
@@ -9,32 +9,24 @@ export default function Example() {
     const [mode, setMode] = useState<SuperSelectMode | undefined>(undefined);
     const [isOuterModalOpen, setIsOuterModalOpen] = useState(false);
 
-    const neverResolvingSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: ({ signal }) =>
-                    new Promise((_, reject) => {
-                        signal?.addEventListener(
-                            "abort",
-                            () => {
-                                reject(new DOMException("The operation was aborted.", "AbortError"));
-                            },
-                            { once: true },
-                        );
-                    }),
+    const neverResolvingSource = useOptionSource({
+        fetch: ({ signal }) =>
+            new Promise((_, reject) => {
+                signal?.addEventListener(
+                    "abort",
+                    () => {
+                        reject(new DOMException("The operation was aborted.", "AbortError"));
+                    },
+                    { once: true },
+                );
             }),
-        [],
-    );
+    });
 
-    const errorSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async () => {
-                    throw new Error("Request failed");
-                },
-            }),
-        [],
-    );
+    const errorSource = useOptionSource({
+        fetch: async () => {
+            throw new Error("Request failed");
+        },
+    });
 
     return (
         <MantineProvider>

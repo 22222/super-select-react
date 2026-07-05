@@ -1,42 +1,37 @@
-import { useMemo } from "react";
-import { createOptionSource, SuperSelect } from "super-select-react";
+import { SuperSelect, useOptionSource } from "super-select-react";
 
 export default function ModalSelectModeExample() {
-    const paginatedSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ offset = 0, limit = 5, signal }) => {
-                    await new Promise((resolve, reject) => {
-                        const timer = window.setTimeout(resolve, 250);
-                        signal?.addEventListener(
-                            "abort",
-                            () => {
-                                window.clearTimeout(timer);
-                                reject(new DOMException("The operation was aborted.", "AbortError"));
-                            },
-                            { once: true },
-                        );
-                    });
+    const paginatedSource = useOptionSource({
+        fetch: async ({ offset = 0, limit = 5, signal }) => {
+            await new Promise((resolve, reject) => {
+                const timer = window.setTimeout(resolve, 250);
+                signal?.addEventListener(
+                    "abort",
+                    () => {
+                        window.clearTimeout(timer);
+                        reject(new DOMException("The operation was aborted.", "AbortError"));
+                    },
+                    { once: true },
+                );
+            });
 
-                    const options = [
-                        { value: "robert-balboa", label: "Robert Balboa" },
-                        { value: "adrian-pennino", label: "Adrian Pennino" },
-                        { value: "apollo-creed", label: "Apollo Creed" },
-                        { value: "james-lang", label: "James Lang" },
-                        { value: "ivan-drago", label: "Ivan Drago" },
-                        { value: "paolo-pennino", label: "Paolo Pennino" },
-                        { value: "tony-burton", label: "Tony Burton" },
-                        { value: "clubber-lang", label: "Clubber Lang" },
-                    ];
+            const options = [
+                { value: "robert-balboa", label: "Robert Balboa" },
+                { value: "adrian-pennino", label: "Adrian Pennino" },
+                { value: "apollo-creed", label: "Apollo Creed" },
+                { value: "james-lang", label: "James Lang" },
+                { value: "ivan-drago", label: "Ivan Drago" },
+                { value: "paolo-pennino", label: "Paolo Pennino" },
+                { value: "tony-burton", label: "Tony Burton" },
+                { value: "clubber-lang", label: "Clubber Lang" },
+            ];
 
-                    return {
-                        options: options.slice(offset, offset + limit),
-                        hasMore: offset + limit < options.length,
-                    };
-                },
-            }),
-        [],
-    );
+            return {
+                options: options.slice(offset, offset + limit),
+                hasMore: offset + limit < options.length,
+            };
+        },
+    });
 
     return (
         <div className="super-select-story__page" data-testid="story-ready">

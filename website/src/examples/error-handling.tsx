@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import {
-    createOptionSource,
     ErrorIndicator,
     type ErrorIndicatorProps,
     OptionSourceError,
     SuperSelect,
     type SuperSelectMode,
+    useOptionSource,
 } from "super-select-react";
 
 import { ModeSelector } from "./ModeSelector";
@@ -23,113 +23,105 @@ export default function ErrorHandlingExample() {
         [],
     );
 
-    const messageErrorSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async () => {
+    const messageErrorSource = useOptionSource(
+        {
+            fetch: async () => {
+                if (isFetchFailureEnabled) {
+                    throw new OptionSourceError("Server returned 503.", {
+                        code: "server",
+                        httpStatus: 503,
+                        userMessage: "Server returned 503 while loading people options.",
+                    });
+                }
+
+                return {
+                    options: peopleOptions,
+                    hasMore: false,
+                };
+            },
+        },
+        [isFetchFailureEnabled, peopleOptions],
+    );
+
+    const noMessageErrorSource = useOptionSource(
+        {
+            fetch: async () => {
+                if (isFetchFailureEnabled) {
+                    throw new OptionSourceError("Server returned 503.");
+                }
+
+                return {
+                    options: peopleOptions,
+                    hasMore: false,
+                };
+            },
+        },
+        [isFetchFailureEnabled, peopleOptions],
+    );
+
+    const labelResolutionWithMessageSource = useOptionSource(
+        {
+            fetch: async ({ values }) => {
+                if (values && values.length > 0) {
                     if (isFetchFailureEnabled) {
-                        throw new OptionSourceError("Server returned 503.", {
+                        throw new OptionSourceError("Unable to resolve labels.", {
                             code: "server",
-                            httpStatus: 503,
-                            userMessage: "Server returned 503 while loading people options.",
+                            userMessage: "Label resolution failed while loading saved values.",
                         });
                     }
 
+                    const requestedValues = new Set(values);
+                    const resolved = [{ value: "id-42", label: "Saved Person 42" }, ...peopleOptions];
                     return {
-                        options: peopleOptions,
+                        options: resolved.filter((option) => requestedValues.has(option.value)),
                         hasMore: false,
                     };
-                },
-            }),
-        [isFetchFailureEnabled, peopleOptions],
-    );
+                }
 
-    const noMessageErrorSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async () => {
-                    if (isFetchFailureEnabled) {
-                        throw new OptionSourceError("Server returned 503.");
-                    }
-
-                    return {
-                        options: peopleOptions,
-                        hasMore: false,
-                    };
-                },
-            }),
-        [isFetchFailureEnabled, peopleOptions],
-    );
-
-    const labelResolutionWithMessageSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ values }) => {
-                    if (values && values.length > 0) {
-                        if (isFetchFailureEnabled) {
-                            throw new OptionSourceError("Unable to resolve labels.", {
-                                code: "server",
-                                userMessage: "Label resolution failed while loading saved values.",
-                            });
-                        }
-
-                        const requestedValues = new Set(values);
-                        const resolved = [{ value: "id-42", label: "Saved Person 42" }, ...peopleOptions];
-                        return {
-                            options: resolved.filter((option) => requestedValues.has(option.value)),
-                            hasMore: false,
-                        };
-                    }
-
-                    return {
-                        options: peopleOptions,
-                        hasMore: false,
-                    };
-                },
-            }),
-        [isFetchFailureEnabled, peopleOptions],
-    );
-
-    const labelResolutionNoMessageSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ values }) => {
-                    if (values && values.length > 0) {
-                        if (isFetchFailureEnabled) {
-                            throw new OptionSourceError("Unable to resolve labels.");
-                        }
-
-                        const requestedValues = new Set(values);
-                        const resolved = [
-                            { value: "id-42", label: "Saved Person 42" },
-                            { value: "id-77", label: "Saved Person 77" },
-                            ...peopleOptions,
-                        ];
-                        return {
-                            options: resolved.filter((option) => requestedValues.has(option.value)),
-                            hasMore: false,
-                        };
-                    }
-
-                    return {
-                        options: peopleOptions,
-                        hasMore: false,
-                    };
-                },
-            }),
-        [isFetchFailureEnabled, peopleOptions],
-    );
-
-    const emptySource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async () => ({
-                    options: [],
+                return {
+                    options: peopleOptions,
                     hasMore: false,
-                }),
-            }),
-        [],
+                };
+            },
+        },
+        [isFetchFailureEnabled, peopleOptions],
     );
+
+    const labelResolutionNoMessageSource = useOptionSource(
+        {
+            fetch: async ({ values }) => {
+                if (values && values.length > 0) {
+                    if (isFetchFailureEnabled) {
+                        throw new OptionSourceError("Unable to resolve labels.");
+                    }
+
+                    const requestedValues = new Set(values);
+                    const resolved = [
+                        { value: "id-42", label: "Saved Person 42" },
+                        { value: "id-77", label: "Saved Person 77" },
+                        ...peopleOptions,
+                    ];
+                    return {
+                        options: resolved.filter((option) => requestedValues.has(option.value)),
+                        hasMore: false,
+                    };
+                }
+
+                return {
+                    options: peopleOptions,
+                    hasMore: false,
+                };
+            },
+        },
+        [isFetchFailureEnabled, peopleOptions],
+    );
+
+    const emptySource = useOptionSource({
+        fetch: async () => ({
+            options: [],
+            hasMore: false,
+        }),
+    });
 
     return (
         <div className="super-select-story__page" data-testid="story-ready">
