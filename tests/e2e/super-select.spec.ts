@@ -538,6 +538,25 @@ test("custom modes apply select props to their visible controls", async ({ page 
     await expect(fallback).toHaveAttribute("lang", "fr");
 });
 
+test("async loading select stays pending after cycling through display modes", async ({ page }) => {
+    await page.goto("/customization");
+    await page.getByTestId("story-ready").first().waitFor();
+
+    // A regression made a fresh options request inherit a previous request's abort after this
+    // exact sequence, turning the infinite-loading select into a phantom load error.
+    await setStoryMode(page, "modal");
+    await setStoryMode(page, "option-list");
+    await setStoryMode(page, "toggle-button");
+
+    const loadingErrorSection = page
+        .locator(".super-select-story__card")
+        .filter({ has: page.getByRole("heading", { name: "Loading And Error Copy" }) });
+
+    // The first select never resolves, so it must stay loading; only the second select errors.
+    await expect(loadingErrorSection.getByRole("status")).toHaveCount(1);
+    await expect(loadingErrorSection.getByText("Unable to load options right now.")).toHaveCount(1);
+});
+
 test("default styles follow right-to-left direction in every mode", async ({ page }) => {
     await page.goto("/test-fixtures");
     await page.getByTestId("story-ready").first().waitFor();
