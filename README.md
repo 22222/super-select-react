@@ -62,33 +62,26 @@ compact button group. `native` renders a real browser `<select>`.
 If your options come from an API or other data source, pass an `optionSource`.
 
 ```tsx
-import { useMemo } from "react";
-import { createOptionSource, SuperSelect } from "super-select-react";
+import { SuperSelect, useOptionSource } from "super-select-react";
 
 export function PersonSourceField() {
-    const peopleSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ values, search = "", offset = 0, limit = 100, signal }) => {
-                    const query = values
-                        ? values.map((value) => `ids=${encodeURIComponent(value)}`).join("&")
-                        : `search=${encodeURIComponent(search)}&offset=${offset}&limit=${limit}`;
-                    const response = await fetch(`/api/people?${query}`, { signal });
-                    if (!response.ok) {
-                        throw new Error(`Unable to load people: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    return {
-                        options: data.items.map((person: { id: string; name: string }) => ({
-                            value: person.id,
-                            label: person.name,
-                        })),
-                        hasMore: data.hasMore,
-                    };
-                },
-            }),
-        [],
-    );
+    const peopleSource = useOptionSource(async ({ values, search = "", offset = 0, limit = 100, signal }) => {
+        const query = values
+            ? values.map((value) => `ids=${encodeURIComponent(value)}`).join("&")
+            : `search=${encodeURIComponent(search)}&offset=${offset}&limit=${limit}`;
+        const response = await fetch(`/api/people?${query}`, { signal });
+        if (!response.ok) {
+            throw new Error(`Unable to load people: ${response.status}`);
+        }
+        const data = await response.json();
+        return {
+            options: data.items.map((person: { id: string; name: string }) => ({
+                value: person.id,
+                label: person.name,
+            })),
+            hasMore: data.hasMore,
+        };
+    });
 
     return <SuperSelect name="person" optionSource={peopleSource} />;
 }
@@ -96,6 +89,12 @@ export function PersonSourceField() {
 
 Super Select sends `values` when it needs to resolve labels for already-selected options, such as a saved value that is
 not on the first page. Handle that request so those options come back even when they would not match the current search.
+
+Super Select tracks an `optionSource` by identity: a new instance means a new source, so its cached options are
+discarded and fetched again. `useOptionSource` accepts the same arguments as `createOptionSource` plus a dependency
+list, and keeps one source instance across renders until a dependency changes, like `useMemo`. List any prop or state
+the fetch function reads in the dependency list. To create a source manually, use `createOptionSource` outside the
+component.
 
 ## Customization
 

@@ -68,9 +68,32 @@ Pass the resulting source to `SuperSelect`:
 ```tsx
 import { SuperSelect } from "super-select-react";
 
-const citySource = React.useMemo(...);
-<SuperSelect name="city" optionSource={citySource} />
+<SuperSelect name="city" optionSource={citySource} />;
 ```
+
+Super Select tracks an `optionSource` by identity, so keep one instance across renders. Define the source outside the
+component like the examples above, or use the `useOptionSource` hook when the fetch logic lives inside a component.
+The hook accepts the same arguments as `createOptionSource`, plus a dependency list:
+
+```tsx
+import { SuperSelect, useOptionSource } from "super-select-react";
+
+export function CityField({ countryCode }: { countryCode: string }) {
+    const citySource = useOptionSource(
+        async ({ values, search, offset, limit, signal }) => fetchCityOptions({ countryCode, values, search, offset, limit, signal }),
+        [countryCode],
+    );
+
+    return <SuperSelect name="city" optionSource={citySource} />;
+}
+```
+
+The dependency list works like `useMemo`: when an entry changes, the hook creates a new source with an empty cache.
+List any prop or state the fetch function reads, such as the `countryCode` above.
+
+Creating a source during render without the hook — for example, passing `createOptionSource(...)` inline in JSX —
+makes every render look like a source replacement: cached options are discarded and requests repeat. Super Select
+logs a console warning in development builds when it detects this.
 
 <OptionSourcesExample />
 
@@ -177,7 +200,7 @@ values. This avoids repeating common requests and allows selected values to reus
 Search results and additional pages are still requested from the source when needed.
 
 Keep the source instance stable so its cache survives React renders. Define it outside the component when possible, or
-create it with `useMemo` when it depends on component state.
+create it with the `useOptionSource` hook when the fetch logic depends on component state.
 
 Disable the built-in cache when the request layer already handles caching or the data must always be refreshed:
 

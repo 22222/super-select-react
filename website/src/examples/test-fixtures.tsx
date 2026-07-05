@@ -9,6 +9,7 @@ import {
     SuperSelect,
     type SuperSelectMode,
     ToggleButtonSelect,
+    useOptionSource,
 } from "super-select-react";
 
 import AsyncFirstPageFallbackExample from "./async-first-page-fallback";
@@ -108,6 +109,81 @@ export default function TestFixtures() {
                 <h3 className="super-select-story__card-title">Custom Pagination Limit</h3>
                 <CustomPaginationLimit />
             </section>
+
+            <section className="super-select-story__card">
+                <h3 className="super-select-story__card-title">Use Option Source Inline Fetch</h3>
+                <UseOptionSourceInlineFetch />
+            </section>
+
+            <section className="super-select-story__card">
+                <h3 className="super-select-story__card-title">Use Option Source Deps Reset</h3>
+                <UseOptionSourceDepsReset />
+            </section>
+        </div>
+    );
+}
+
+function UseOptionSourceInlineFetch() {
+    const [renderCount, setRenderCount] = useState(1);
+    const optionSource = useOptionSource(async ({ search = "" }) => {
+        if (typeof window !== "undefined") {
+            const testWindow = window as Window & { __useOptionSourceFetchCount?: number };
+            testWindow.__useOptionSourceFetchCount = (testWindow.__useOptionSourceFetchCount ?? 0) + 1;
+        }
+
+        const normalizedSearch = search.trim().toLowerCase();
+        const options = [
+            { value: "alpha", label: "Alpha" },
+            { value: "bravo", label: "Bravo" },
+        ];
+        return {
+            options: options.filter((option) => option.label.toLowerCase().includes(normalizedSearch)),
+            hasMore: false,
+        };
+    });
+
+    return (
+        <div className="super-select-story__stack">
+            <button
+                type="button"
+                className="super-select__btn super-select__btn-secondary"
+                onClick={() => setRenderCount((count) => count + 1)}
+            >
+                Rerender inline fetch
+            </button>
+            <output data-testid="use-option-source-render-count">{renderCount}</output>
+            <SuperSelect
+                mode="option-list"
+                name="useOptionSourceInlineFetch"
+                aria-label="useOptionSourceInlineFetch"
+                optionSource={optionSource}
+            />
+        </div>
+    );
+}
+
+function UseOptionSourceDepsReset() {
+    const [group, setGroup] = useState<"first" | "second">("first");
+    const optionSource = useOptionSource(
+        async () => ({
+            options:
+                group === "first" ? [{ value: "first-alpha", label: "First Alpha" }] : [{ value: "second-charlie", label: "Second Charlie" }],
+            hasMore: false,
+        }),
+        [group],
+    );
+
+    return (
+        <div className="super-select-story__stack">
+            <button type="button" className="super-select__btn super-select__btn-secondary" onClick={() => setGroup("second")}>
+                Switch source deps
+            </button>
+            <SuperSelect
+                mode="option-list"
+                name="useOptionSourceDepsReset"
+                aria-label="useOptionSourceDepsReset"
+                optionSource={optionSource}
+            />
         </div>
     );
 }
