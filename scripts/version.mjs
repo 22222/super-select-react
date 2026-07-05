@@ -4,6 +4,7 @@ import path from "node:path";
 const rootDir = process.cwd();
 const rootPackageJsonPath = path.join(rootDir, "package.json");
 const rootPackageLockPath = path.join(rootDir, "package-lock.json");
+const websitePackageLockPath = path.join(rootDir, "website", "package-lock.json");
 
 const semverPattern = /^\d+\.\d+\.\d+$/;
 const supportedInputs = ["sync", "patch", "minor", "major", "<x.y.z>"];
@@ -24,12 +25,16 @@ await writeJson(rootPackageJsonPath, rootPackageJson);
 
 const rootPackageLock = JSON.parse(await fs.readFile(rootPackageLockPath, "utf8"));
 rootPackageLock.version = nextVersion;
-
 if (rootPackageLock.packages?.[""]) {
     rootPackageLock.packages[""].version = nextVersion;
 }
-
 await writeJson(rootPackageLockPath, rootPackageLock);
+
+const websitePackageLock = JSON.parse(await fs.readFile(websitePackageLockPath, "utf8"));
+if (websitePackageLock.packages?.[".."]) {
+    websitePackageLock.packages[".."].version = nextVersion;
+    await writeJson(websitePackageLockPath, websitePackageLock);
+}
 
 console.log(`Synchronized release version: ${currentVersion} -> ${nextVersion}`);
 

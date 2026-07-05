@@ -1,7 +1,7 @@
 {
   "name": "super-select-react",
   "private": false,
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "An enhanced drop-in replacement for native select with a consistent experience across devices.",
   "license": "MIT OR Unlicense",
   "repository": {
