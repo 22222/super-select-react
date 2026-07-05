@@ -828,6 +828,7 @@ function useAsyncOptionSource() {
 function TransitionPendingIndicator({ name, ...props }: PendingIndicatorProps & { name: string }) {
     if (typeof window !== "undefined") {
         const testWindow = window as Window & { __transitionPendingNames?: string[] };
+        // eslint-disable-next-line react-hooks/immutability -- e2e instrumentation must record synchronously with render, not after an effect
         testWindow.__transitionPendingNames = [...(testWindow.__transitionPendingNames ?? []), name];
     }
 
@@ -841,6 +842,7 @@ function TransitionPendingIndicator({ name, ...props }: PendingIndicatorProps & 
 function TransitionEmptyIndicator({ name, ...props }: EmptyIndicatorProps & { name: string }) {
     if (typeof window !== "undefined") {
         const testWindow = window as Window & { __transitionEmptyNames?: string[] };
+        // eslint-disable-next-line react-hooks/immutability -- e2e instrumentation must record synchronously with render, not after an effect
         testWindow.__transitionEmptyNames = [...(testWindow.__transitionEmptyNames ?? []), name];
     }
 

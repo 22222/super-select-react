@@ -243,6 +243,7 @@ function InitialMountOptionSourceSelect({ mode, name }: { mode: SuperSelectMode;
 function InitialMountPendingIndicator({ mode, ...props }: PendingIndicatorProps & { mode: SuperSelectMode }) {
     if (typeof window !== "undefined") {
         const testWindow = window as Window & { __initialMountPendingModes?: string[] };
+        // eslint-disable-next-line react-hooks/immutability -- e2e instrumentation must record synchronously with render, not after an effect
         testWindow.__initialMountPendingModes = [...(testWindow.__initialMountPendingModes ?? []), mode];
     }
 
@@ -256,6 +257,7 @@ function InitialMountPendingIndicator({ mode, ...props }: PendingIndicatorProps 
 function InitialMountEmptyIndicator({ mode, ...props }: EmptyIndicatorProps & { mode: SuperSelectMode }) {
     if (typeof window !== "undefined") {
         const testWindow = window as Window & { __initialMountEmptyModes?: string[] };
+        // eslint-disable-next-line react-hooks/immutability -- e2e instrumentation must record synchronously with render, not after an effect
         testWindow.__initialMountEmptyModes = [...(testWindow.__initialMountEmptyModes ?? []), mode];
     }
 
