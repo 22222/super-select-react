@@ -239,6 +239,46 @@ describe("OptionSourceBufferedFetcher", () => {
         expect(fetcher).toHaveBeenCalledTimes(1);
     });
 
+    it("does not leak an abort to a fresh subscriber that joins an already-aborted run", async () => {
+        const fetcher = vi.fn(
+            (request: OptionSourceFetchRequest<string>) =>
+                new Promise<OptionSourceFetchResponse<string>>((_, reject) => {
+                    request.signal?.addEventListener("abort", () => reject(new DOMException("The operation was aborted.", "AbortError")), {
+                        once: true,
+                    });
+                }),
+        );
+
+        const buffered = new OptionSourceBufferedFetcher<string>(fetcher);
+        const firstController = new AbortController();
+
+        const first = buffered.fetch({ search: "ab", signal: firstController.signal });
+        await Promise.resolve();
+        expect(fetcher).toHaveBeenCalledTimes(1);
+
+        // Aborting the only subscriber aborts the run, but it lingers in the pending list until
+        // its cleanup microtask runs, so a brand-new subscriber can still find it.
+        firstController.abort();
+        const secondController = new AbortController();
+        const second = buffered.fetch({ search: "ab", signal: secondController.signal });
+
+        await expect(first).rejects.toMatchObject({ name: "AbortError" });
+
+        // The fresh subscriber never aborted, so it must start a new fetch instead of inheriting the abort.
+        const settled = await Promise.race([
+            second.then(
+                () => "resolved" as const,
+                () => "rejected" as const,
+            ),
+            Promise.resolve().then(() => "pending" as const),
+        ]);
+        expect(settled).toBe("pending");
+        expect(fetcher).toHaveBeenCalledTimes(2);
+
+        secondController.abort();
+        await expect(second).rejects.toMatchObject({ name: "AbortError" });
+    });
+
     it("filters and orders grouped options in values-only results per subscriber", async () => {
         const deferreds: Array<Deferred<OptionSourceFetchResponse<string>>> = [];
         const fetcher = vi.fn(() => {

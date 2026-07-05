@@ -37,6 +37,10 @@ export class OptionSourceBufferedFetcher<TData = unknown> {
 
         for (let pendingQueryRunIndex = 0; pendingQueryRunIndex < this.pendingQueryRuns.length; pendingQueryRunIndex++) {
             const request = this.pendingQueryRuns[pendingQueryRunIndex];
+            if (request.abortController.signal.aborted) {
+                continue;
+            }
+
             const leftValues = request.query.values;
             const rightValues = normalizedQuery.values;
 
