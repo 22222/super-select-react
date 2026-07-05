@@ -42,6 +42,7 @@ export { SuperSelect } from "./SuperSelect";
 export type { SuperSelectCustomization } from "./SuperSelectCustomization";
 export type { ToggleButtonInputProps, ToggleButtonSelectProps } from "./toggle-button-select";
 export { ToggleButtonInput, ToggleButtonSelect } from "./toggle-button-select";
+export { useOptionSource } from "./useOptionSource";
 export type { ErrorIndicatorProps } from "./utils/ErrorIndicator";
 export { ErrorIndicator } from "./utils/ErrorIndicator";
 export type { FallbackProps } from "./utils/Fallback";

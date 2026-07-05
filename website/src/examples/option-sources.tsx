@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    createOptionSource,
     type EmptyIndicatorProps,
     type PendingIndicatorProps,
     SuperSelect,
     type SuperSelectMode,
+    useOptionSource,
 } from "super-select-react";
 
 import { ModeSelector } from "./ModeSelector";
@@ -15,126 +15,114 @@ export default function Example() {
     const [multiValue, setMultiValue] = useState<string[]>([]);
     const [initialMountReloadKey, setInitialMountReloadKey] = useState(0);
 
-    const citySource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ values, search = "", offset = 0, limit = 8, signal }) => {
-                    await new Promise((resolve, reject) => {
-                        const timer = window.setTimeout(resolve, 350);
-                        signal?.addEventListener(
-                            "abort",
-                            () => {
-                                window.clearTimeout(timer);
-                                reject(new DOMException("The operation was aborted.", "AbortError"));
-                            },
-                            { once: true },
-                        );
-                    });
+    const citySource = useOptionSource({
+        fetch: async ({ values, search = "", offset = 0, limit = 8, signal }) => {
+            await new Promise((resolve, reject) => {
+                const timer = window.setTimeout(resolve, 350);
+                signal?.addEventListener(
+                    "abort",
+                    () => {
+                        window.clearTimeout(timer);
+                        reject(new DOMException("The operation was aborted.", "AbortError"));
+                    },
+                    { once: true },
+                );
+            });
 
-                    const allOptions = [
-                        { value: "austin", label: "Austin" },
-                        { value: "boston", label: "Boston" },
-                        { value: "chicago", label: "Chicago" },
-                        { value: "dallas", label: "Dallas" },
-                        { value: "denver", label: "Denver" },
-                        { value: "el-paso", label: "El Paso" },
-                        { value: "houston", label: "Houston" },
-                        { value: "las-vegas", label: "Las Vegas" },
-                        { value: "los-angeles", label: "Los Angeles" },
-                        { value: "new-york", label: "New York" },
-                        { value: "san-antonio", label: "San Antonio" },
-                        { value: "san-diego", label: "San Diego" },
-                        { value: "san-francisco", label: "San Francisco" },
-                        { value: "san-jose", label: "San Jose" },
-                        { value: "seattle", label: "Seattle" },
-                        { value: "tampa", label: "Tampa" },
-                    ];
+            const allOptions = [
+                { value: "austin", label: "Austin" },
+                { value: "boston", label: "Boston" },
+                { value: "chicago", label: "Chicago" },
+                { value: "dallas", label: "Dallas" },
+                { value: "denver", label: "Denver" },
+                { value: "el-paso", label: "El Paso" },
+                { value: "houston", label: "Houston" },
+                { value: "las-vegas", label: "Las Vegas" },
+                { value: "los-angeles", label: "Los Angeles" },
+                { value: "new-york", label: "New York" },
+                { value: "san-antonio", label: "San Antonio" },
+                { value: "san-diego", label: "San Diego" },
+                { value: "san-francisco", label: "San Francisco" },
+                { value: "san-jose", label: "San Jose" },
+                { value: "seattle", label: "Seattle" },
+                { value: "tampa", label: "Tampa" },
+            ];
 
-                    if (values && values.length > 0) {
-                        const requested = new Set(values);
-                        return {
-                            options: allOptions.filter((option) => requested.has(option.value)),
-                            hasMore: false,
-                        };
-                    }
+            if (values && values.length > 0) {
+                const requested = new Set(values);
+                return {
+                    options: allOptions.filter((option) => requested.has(option.value)),
+                    hasMore: false,
+                };
+            }
 
-                    const normalizedSearch = search.trim().toLowerCase();
-                    const filtered = allOptions.filter((option) => option.label.toLowerCase().includes(normalizedSearch));
-                    return {
-                        options: filtered.slice(offset, offset + limit),
-                        hasMore: offset + limit < filtered.length,
-                    };
-                },
+            const normalizedSearch = search.trim().toLowerCase();
+            const filtered = allOptions.filter((option) => option.label.toLowerCase().includes(normalizedSearch));
+            return {
+                options: filtered.slice(offset, offset + limit),
+                hasMore: offset + limit < filtered.length,
+            };
+        },
+    });
+
+    const neverSource = useOptionSource({
+        fetch: ({ signal }) =>
+            new Promise((_, reject) => {
+                signal?.addEventListener("abort", () => reject(new DOMException("The operation was aborted.", "AbortError")), {
+                    once: true,
+                });
             }),
-        [],
-    );
+    });
 
-    const neverSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: ({ signal }) =>
-                    new Promise((_, reject) => {
-                        signal?.addEventListener("abort", () => reject(new DOMException("The operation was aborted.", "AbortError")), {
-                            once: true,
-                        });
-                    }),
-            }),
-        [],
-    );
+    const limitedPaginationSource = useOptionSource({
+        fetch: async ({ values, search = "", offset = 0, limit = 4, signal }) => {
+            await new Promise((resolve, reject) => {
+                const timer = window.setTimeout(resolve, 350);
+                signal?.addEventListener(
+                    "abort",
+                    () => {
+                        window.clearTimeout(timer);
+                        reject(new DOMException("The operation was aborted.", "AbortError"));
+                    },
+                    { once: true },
+                );
+            });
 
-    const limitedPaginationSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ values, search = "", offset = 0, limit = 4, signal }) => {
-                    await new Promise((resolve, reject) => {
-                        const timer = window.setTimeout(resolve, 350);
-                        signal?.addEventListener(
-                            "abort",
-                            () => {
-                                window.clearTimeout(timer);
-                                reject(new DOMException("The operation was aborted.", "AbortError"));
-                            },
-                            { once: true },
-                        );
-                    });
+            const allOptions = [
+                { value: "austin", label: "Austin" },
+                { value: "boston", label: "Boston" },
+                { value: "chicago", label: "Chicago" },
+                { value: "dallas", label: "Dallas" },
+                { value: "denver", label: "Denver" },
+                { value: "el-paso", label: "El Paso" },
+                { value: "houston", label: "Houston" },
+                { value: "las-vegas", label: "Las Vegas" },
+                { value: "los-angeles", label: "Los Angeles" },
+                { value: "new-york", label: "New York" },
+                { value: "san-antonio", label: "San Antonio" },
+                { value: "san-diego", label: "San Diego" },
+                { value: "san-francisco", label: "San Francisco" },
+                { value: "san-jose", label: "San Jose" },
+                { value: "seattle", label: "Seattle" },
+                { value: "tampa", label: "Tampa" },
+            ];
 
-                    const allOptions = [
-                        { value: "austin", label: "Austin" },
-                        { value: "boston", label: "Boston" },
-                        { value: "chicago", label: "Chicago" },
-                        { value: "dallas", label: "Dallas" },
-                        { value: "denver", label: "Denver" },
-                        { value: "el-paso", label: "El Paso" },
-                        { value: "houston", label: "Houston" },
-                        { value: "las-vegas", label: "Las Vegas" },
-                        { value: "los-angeles", label: "Los Angeles" },
-                        { value: "new-york", label: "New York" },
-                        { value: "san-antonio", label: "San Antonio" },
-                        { value: "san-diego", label: "San Diego" },
-                        { value: "san-francisco", label: "San Francisco" },
-                        { value: "san-jose", label: "San Jose" },
-                        { value: "seattle", label: "Seattle" },
-                        { value: "tampa", label: "Tampa" },
-                    ];
+            if (values && values.length > 0) {
+                const requested = new Set(values);
+                return {
+                    options: allOptions.filter((option) => requested.has(option.value)),
+                    hasMore: false,
+                };
+            }
 
-                    if (values && values.length > 0) {
-                        const requested = new Set(values);
-                        return {
-                            options: allOptions.filter((option) => requested.has(option.value)),
-                            hasMore: false,
-                        };
-                    }
-
-                    const normalizedSearch = search.trim().toLowerCase();
-                    const filtered = allOptions.filter((option) => option.label.toLowerCase().includes(normalizedSearch));
-                    return {
-                        options: filtered.slice(offset, offset + limit),
-                        hasMore: offset + limit < filtered.length,
-                    };
-                },
-            }),
-        [],
-    );
+            const normalizedSearch = search.trim().toLowerCase();
+            const filtered = allOptions.filter((option) => option.label.toLowerCase().includes(normalizedSearch));
+            return {
+                options: filtered.slice(offset, offset + limit),
+                hasMore: offset + limit < filtered.length,
+            };
+        },
+    });
 
     return (
         <div className="super-select-story__page" data-testid="story-ready">
@@ -224,7 +212,7 @@ function AsyncCityPendingIndicator(props: PendingIndicatorProps) {
 }
 
 function InitialMountOptionSourceSelect({ mode, name }: { mode: SuperSelectMode; name: string }) {
-    const optionSource = createOptionSource(async () => {
+    const optionSource = useOptionSource(async () => {
         await new Promise((resolve) => window.setTimeout(resolve, 150));
         return {
             options: [
@@ -255,6 +243,7 @@ function InitialMountOptionSourceSelect({ mode, name }: { mode: SuperSelectMode;
 function InitialMountPendingIndicator({ mode, ...props }: PendingIndicatorProps & { mode: SuperSelectMode }) {
     if (typeof window !== "undefined") {
         const testWindow = window as Window & { __initialMountPendingModes?: string[] };
+        // eslint-disable-next-line react-hooks/immutability -- e2e instrumentation must record synchronously with render, not after an effect
         testWindow.__initialMountPendingModes = [...(testWindow.__initialMountPendingModes ?? []), mode];
     }
 
@@ -268,6 +257,7 @@ function InitialMountPendingIndicator({ mode, ...props }: PendingIndicatorProps 
 function InitialMountEmptyIndicator({ mode, ...props }: EmptyIndicatorProps & { mode: SuperSelectMode }) {
     if (typeof window !== "undefined") {
         const testWindow = window as Window & { __initialMountEmptyModes?: string[] };
+        // eslint-disable-next-line react-hooks/immutability -- e2e instrumentation must record synchronously with render, not after an effect
         testWindow.__initialMountEmptyModes = [...(testWindow.__initialMountEmptyModes ?? []), mode];
     }
 

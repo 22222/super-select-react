@@ -125,6 +125,8 @@ export function SuperSelect<Multiple extends boolean = false>({
     style,
     ...selectProps
 }: SuperSelectProps<Multiple>) {
+    useOptionSourceIdentityWarning(optionSource);
+
     const requestedMode = typeof mode === "function" ? undefined : mode;
     const modeResolver = typeof mode === "function" ? mode : undefined;
 
@@ -637,4 +639,44 @@ function createPendingOptionsState(loadKey: OptionLoadKey): OptionLoadState {
         ...PENDING_OPTIONS_STATE,
         loadKey,
     };
+}
+
+declare const process: { env?: { NODE_ENV?: string } } | undefined;
+
+/**
+ * Warns in development when the optionSource prop looks like it is recreated on every render,
+ * which discards cached options and repeats fetch requests.
+ */
+function useOptionSourceIdentityWarning(optionSource: OptionSourceLike | undefined) {
+    const previousOptionSourceRef = useRef(optionSource);
+    const changeCountRef = useRef(0);
+    const changeWindowStartRef = useRef(0);
+
+    useEffect(() => {
+        const isProduction = typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production";
+        if (isProduction) {
+            return;
+        }
+
+        const previousOptionSource = previousOptionSourceRef.current;
+        previousOptionSourceRef.current = optionSource;
+        if (!optionSource || !previousOptionSource || optionSource === previousOptionSource) {
+            return;
+        }
+
+        const now = Date.now();
+        if (now - changeWindowStartRef.current > 2000) {
+            changeWindowStartRef.current = now;
+            changeCountRef.current = 0;
+        }
+
+        changeCountRef.current += 1;
+        if (changeCountRef.current === 5) {
+            console.warn(
+                "SuperSelect: the optionSource prop changed identity 5 times within 2 seconds. " +
+                    "Each new option source discards cached options and fetches again. " +
+                    "If the source is created during render, keep one instance across renders with the useOptionSource hook or useMemo.",
+            );
+        }
+    });
 }

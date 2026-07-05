@@ -11,36 +11,37 @@ import ErrorHandlingExample from "@site/src/examples/error-handling";
 Use `optionSource` when options come from somewhere other than local `<option>` children. The source might call an API,
 read IndexedDB, query a cache, or compute options from application state.
 
-Use `createOptionSource` to wrap the fetch logic for a select field. It gives Super Select one place to load the visible
-option list and resolve the labels of already-selected values.
-
 ## Creating an Option Source
 
 An API-backed option source translates the request into the format expected by the endpoint:
 
 ```tsx
-import { createOptionSource } from "super-select-react";
+import { SuperSelect, useOptionSource } from "super-select-react";
 
-const citySource = createOptionSource(async ({ values, search, offset, limit, after, signal }) => {
-    const response = await fetch("/api/cities/options", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ values, search, offset, limit, after: after?.value }),
-        signal,
+function CitySelect() {
+    const citySource = useOptionSource(async ({ values, search, offset, limit, after, signal }) => {
+        const response = await fetch("/api/cities/options", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ values, search, offset, limit, after: after?.value }),
+            signal,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Unable to load cities: ${response.status}`);
+        }
+
+        return response.json();
     });
 
-    if (!response.ok) {
-        throw new Error(`Unable to load cities: ${response.status}`);
-    }
-
-    return response.json();
-});
+    return <SuperSelect name="city" optionSource={citySource} />;
+}
 ```
 
 An option source can also work directly with something like a local array:
 
 ```tsx
-import { createOptionSource } from "super-select-react";
+import { SuperSelect, useOptionSource } from "super-select-react";
 
 const cities = [
     { value: "austin", label: "Austin" },
@@ -48,35 +49,59 @@ const cities = [
     { value: "seattle", label: "Seattle" },
 ];
 
-const citySource = createOptionSource(async ({ values, search = "", offset = 0, limit = 100 }) => {
-    const normalizedSearch = search.trim().toLowerCase();
-    const matchingCities = cities.filter((city) => {
-        if (values) {
-            return values.includes(city.value);
-        }
-        return city.label.toLowerCase().includes(normalizedSearch);
+function CitySelect() {
+    const citySource = useOptionSource(async ({ values, search = "", offset = 0, limit = 100 }) => {
+        const normalizedSearch = search.trim().toLowerCase();
+        const matchingCities = cities.filter((city) => {
+            if (values) {
+                return values.includes(city.value);
+            }
+            return city.label.toLowerCase().includes(normalizedSearch);
+        });
+        return {
+            options: matchingCities.slice(offset, offset + limit),
+            hasMore: offset + limit < matchingCities.length,
+        };
     });
-    return {
-        options: matchingCities.slice(offset, offset + limit),
-        hasMore: offset + limit < matchingCities.length,
-    };
-});
+
+    return <SuperSelect name="city" optionSource={citySource} />;
+}
 ```
 
-Pass the resulting source to `SuperSelect`:
+`useOptionSource` keeps the same source until its dependencies change.  When the fetch logic reads a prop or state value, pass a
+dependency list as the second argument, like `useMemo`:
 
 ```tsx
-import { SuperSelect } from "super-select-react";
+import { SuperSelect, useOptionSource } from "super-select-react";
 
-const citySource = React.useMemo(...);
-<SuperSelect name="city" optionSource={citySource} />
+function CitySelect({ countryCode }: { countryCode: string }) {
+    const citySource = useOptionSource(
+        async ({ values, search, offset, limit, signal }) => fetchCityOptions({ countryCode, values, search, offset, limit, signal }),
+        [countryCode],
+    );
+
+    return <SuperSelect name="city" optionSource={citySource} />;
+}
+```
+
+Skip the hook and call createOptionSource directly when the source lives outside a component or when you want to control
+memoization yourself with `useMemo`:
+
+```tsx
+import { useMemo } from "react";
+import { createOptionSource, SuperSelect } from "super-select-react";
+
+function CitySelect({ countryCode }: { countryCode: string }) {
+    const citySource = useMemo(() => createOptionSource(fetchCityOptions), []);
+    return <SuperSelect name="city" optionSource={citySource} />;
+}
 ```
 
 <OptionSourcesExample />
 
 ## Requests and Responses
 
-`createOptionSource` accepts an async function that Super Select calls for two kinds of requests:
+The fetch function you pass to `useOptionSource` handles two kinds of requests:
 
 - Load a list of options, optionally filtered by a search term and paginated.
 - Resolve options for a set of values so their labels can be displayed when they are not in the default list of options.
@@ -153,7 +178,7 @@ const peopleByGroup = [
         ],
     },
 ];
-const source = createOptionSource(async ({ values, search = "", offset = 0, limit = 100 }) => {
+const source = useOptionSource(async ({ values, search = "", offset = 0, limit = 100 }) => {
     const normalizedSearch = search.trim().toLowerCase();
     const matchingOptions = peopleByGroup
         .flatMap((group) => group.options.map((option) => ({ ...option, groupLabel: group.label })))
@@ -169,20 +194,18 @@ const source = createOptionSource(async ({ values, search = "", offset = 0, limi
 
 <GroupedAsyncExample />
 
-
 ## Caching
 
-Sources created with `createOptionSource` cache the first unfiltered page and options returned while resolving selected
-values. This avoids repeating common requests and allows selected values to reuse labels that have already been loaded.
-Search results and additional pages are still requested from the source when needed.
+Option sources cache the first unfiltered page and options returned while resolving selected values. This avoids
+repeating common requests and allows selected values to reuse labels that have already been loaded. Search results and
+additional pages are still requested from the source when needed.
 
-Keep the source instance stable so its cache survives React renders. Define it outside the component when possible, or
-create it with `useMemo` when it depends on component state.
+`useOptionSource` keeps the source instance stable so its cache survives React renders.
 
 Disable the built-in cache when the request layer already handles caching or the data must always be refreshed:
 
 ```tsx
-const citySource = createOptionSource({
+const citySource = useOptionSource({
     fetch: fetchCities,
     noCache: true,
 });
@@ -193,7 +216,6 @@ Call `clearCache` after the underlying data changes and previously loaded option
 ```tsx
 citySource.clearCache?.();
 ```
-
 
 ## Error Handling
 

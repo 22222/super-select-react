@@ -2,8 +2,8 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useMemo, useState } from "react";
-import { createOptionSource, type SuperSelectMode } from "super-select-react";
+import { useState } from "react";
+import { type SuperSelectMode, useOptionSource } from "super-select-react";
 
 import { MaterialSuperSelect } from "../components/MaterialSuperSelect";
 import { ModeSelector } from "./ModeSelector";
@@ -12,32 +12,24 @@ export default function Example() {
     const [mode, setMode] = useState<SuperSelectMode | undefined>(undefined);
     const [isOuterDialogOpen, setIsOuterDialogOpen] = useState(false);
 
-    const neverResolvingSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: ({ signal }) =>
-                    new Promise((_, reject) => {
-                        signal?.addEventListener(
-                            "abort",
-                            () => {
-                                reject(new DOMException("The operation was aborted.", "AbortError"));
-                            },
-                            { once: true },
-                        );
-                    }),
+    const neverResolvingSource = useOptionSource({
+        fetch: ({ signal }) =>
+            new Promise((_, reject) => {
+                signal?.addEventListener(
+                    "abort",
+                    () => {
+                        reject(new DOMException("The operation was aborted.", "AbortError"));
+                    },
+                    { once: true },
+                );
             }),
-        [],
-    );
+    });
 
-    const errorSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async () => {
-                    throw new Error("Request failed");
-                },
-            }),
-        [],
-    );
+    const errorSource = useOptionSource({
+        fetch: async () => {
+            throw new Error("Request failed");
+        },
+    });
 
     return (
         <div className="super-select-story__page" data-testid="story-ready">

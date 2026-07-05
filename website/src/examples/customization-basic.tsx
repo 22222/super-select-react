@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { createOptionSource, SuperSelect, type SuperSelectMode } from "super-select-react";
+import { useState } from "react";
+import { SuperSelect, type SuperSelectMode, useOptionSource } from "super-select-react";
 
 import { ModeSelector } from "./ModeSelector";
 
@@ -21,50 +21,38 @@ const PEOPLE = [
 export default function Example() {
     const [mode, setMode] = useState<SuperSelectMode | undefined>(undefined);
 
-    const pagedPeopleSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ search = "", offset = 0, limit = 3 }) => {
-                    const normalizedSearch = search.trim().toLowerCase();
-                    const filteredOptions = normalizedSearch
-                        ? PEOPLE.filter((option) => option.label.toLowerCase().includes(normalizedSearch))
-                        : PEOPLE;
-                    const pageOptions = filteredOptions.slice(offset, offset + limit);
-                    return {
-                        options: pageOptions,
-                        hasMore: offset + pageOptions.length < filteredOptions.length,
-                    };
-                },
-            }),
-        [],
-    );
+    const pagedPeopleSource = useOptionSource({
+        fetch: async ({ search = "", offset = 0, limit = 3 }) => {
+            const normalizedSearch = search.trim().toLowerCase();
+            const filteredOptions = normalizedSearch
+                ? PEOPLE.filter((option) => option.label.toLowerCase().includes(normalizedSearch))
+                : PEOPLE;
+            const pageOptions = filteredOptions.slice(offset, offset + limit);
+            return {
+                options: pageOptions,
+                hasMore: offset + pageOptions.length < filteredOptions.length,
+            };
+        },
+    });
 
-    const loadingSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: ({ signal }) =>
-                    new Promise((_, reject) => {
-                        signal?.addEventListener(
-                            "abort",
-                            () => {
-                                reject(new DOMException("The operation was aborted.", "AbortError"));
-                            },
-                            { once: true },
-                        );
-                    }),
+    const loadingSource = useOptionSource({
+        fetch: ({ signal }) =>
+            new Promise((_, reject) => {
+                signal?.addEventListener(
+                    "abort",
+                    () => {
+                        reject(new DOMException("The operation was aborted.", "AbortError"));
+                    },
+                    { once: true },
+                );
             }),
-        [],
-    );
+    });
 
-    const errorSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async () => {
-                    throw new Error("Request failed");
-                },
-            }),
-        [],
-    );
+    const errorSource = useOptionSource({
+        fetch: async () => {
+            throw new Error("Request failed");
+        },
+    });
 
     return (
         <div className="super-select-story__page" data-testid="story-ready">

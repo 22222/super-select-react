@@ -62,33 +62,26 @@ compact button group. `native` renders a real browser `<select>`.
 If your options come from an API or other data source, pass an `optionSource`.
 
 ```tsx
-import { useMemo } from "react";
-import { createOptionSource, SuperSelect } from "super-select-react";
+import { SuperSelect, useOptionSource } from "super-select-react";
 
-export function PersonSourceField() {
-    const peopleSource = useMemo(
-        () =>
-            createOptionSource({
-                fetch: async ({ values, search = "", offset = 0, limit = 100, signal }) => {
-                    const query = values
-                        ? values.map((value) => `ids=${encodeURIComponent(value)}`).join("&")
-                        : `search=${encodeURIComponent(search)}&offset=${offset}&limit=${limit}`;
-                    const response = await fetch(`/api/people?${query}`, { signal });
-                    if (!response.ok) {
-                        throw new Error(`Unable to load people: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    return {
-                        options: data.items.map((person: { id: string; name: string }) => ({
-                            value: person.id,
-                            label: person.name,
-                        })),
-                        hasMore: data.hasMore,
-                    };
-                },
-            }),
-        [],
-    );
+export function PersonSelect() {
+    const peopleSource = useOptionSource(async ({ values, search = "", offset = 0, limit = 100, signal }) => {
+        const query = values
+            ? values.map((value) => `ids=${encodeURIComponent(value)}`).join("&")
+            : `search=${encodeURIComponent(search)}&offset=${offset}&limit=${limit}`;
+        const response = await fetch(`/api/people?${query}`, { signal });
+        if (!response.ok) {
+            throw new Error(`Unable to load people: ${response.status}`);
+        }
+        const data = await response.json();
+        return {
+            options: data.items.map((person: { id: string; name: string }) => ({
+                value: person.id,
+                label: person.name,
+            })),
+            hasMore: data.hasMore,
+        };
+    });
 
     return <SuperSelect name="person" optionSource={peopleSource} />;
 }

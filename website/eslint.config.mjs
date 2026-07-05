@@ -1,3 +1,4 @@
+import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import tseslint from "typescript-eslint";
 import { defineConfig } from "eslint/config";
@@ -14,6 +15,7 @@ export default defineConfig([
     ...tseslint.configs.recommended,
     {
         files: ["src/**/*.{ts,tsx}"],
+        extends: [reactHooks.configs.flat.recommended],
         plugins: {
             "simple-import-sort": simpleImportSort,
         },
