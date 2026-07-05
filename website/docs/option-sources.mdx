@@ -68,8 +68,8 @@ function CitySelect() {
 }
 ```
 
-The `useOptionSource` keeps the same source until its dependencies change.  When the fetch logic reads a prop or state value, pass a
-dependency list as the second argument, just like in the `useMemo` hook:
+`useOptionSource` keeps the same source until its dependencies change.  When the fetch logic reads a prop or state value, pass a
+dependency list as the second argument, like `useMemo`:
 
 ```tsx
 import { SuperSelect, useOptionSource } from "super-select-react";
@@ -84,11 +84,12 @@ function CitySelect({ countryCode }: { countryCode: string }) {
 }
 ```
 
-You can also skip the hook and use the `createOptionSource` function directly.  For example, if you need to create the option source 
-outside of a component or want to `useMemo` directly, like:
+Skip the hook and call createOptionSource directly when the source lives outside a component or when you want to control
+memoization yourself with `useMemo`:
 
 ```tsx
-import { SuperSelect, useOptionSource } from "super-select-react";
+import { useMemo } from "react";
+import { createOptionSource, SuperSelect } from "super-select-react";
 
 function CitySelect({ countryCode }: { countryCode: string }) {
     const citySource = useMemo(() => createOptionSource(fetchCityOptions), []);
@@ -193,7 +194,6 @@ const source = useOptionSource(async ({ values, search = "", offset = 0, limit =
 
 <GroupedAsyncExample />
 
-
 ## Caching
 
 Option sources cache the first unfiltered page and options returned while resolving selected values. This avoids
@@ -216,7 +216,6 @@ Call `clearCache` after the underlying data changes and previously loaded option
 ```tsx
 citySource.clearCache?.();
 ```
-
 
 ## Error Handling
 
