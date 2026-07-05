@@ -4,10 +4,8 @@ import { useMemo } from "react";
 import { createOptionSource, type OptionSourceFetcher, type OptionSourceInit, type OptionSourceLike } from "./option-source";
 
 /**
- * Creates an option source with `createOptionSource`, keeping one source instance across renders
- * until `deps` changes (like `useMemo`).
- * Include a value in `deps` when a change to that value should discard cached options and reload,
- * including any prop or state that a fetch function reads.
+ * Creates and memoizes an option source from a fetcher, configuration object, or existing option source.
+ * The option source will only be recreated when one of the optional `deps` has changed.
  */
 export function useOptionSource<TData = unknown>(
     init: OptionSourceLike<TData> | OptionSourceInit<TData> | OptionSourceFetcher<TData>,

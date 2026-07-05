@@ -527,45 +527,6 @@ function modeSupportsOptionSource(mode: SuperSelectMode) {
     return mode === "modal" || mode === "option-list";
 }
 
-declare const process: { env: { NODE_ENV?: string } };
-
-/**
- * Warns in development when the optionSource prop looks like it is recreated on every render,
- * which discards cached options and repeats fetch requests.
- */
-function useOptionSourceIdentityWarning(optionSource: OptionSourceLike | undefined) {
-    const previousOptionSourceRef = useRef(optionSource);
-    const changeCountRef = useRef(0);
-    const changeWindowStartRef = useRef(0);
-
-    useEffect(() => {
-        if (process.env.NODE_ENV === "production") {
-            return;
-        }
-
-        const previousOptionSource = previousOptionSourceRef.current;
-        previousOptionSourceRef.current = optionSource;
-        if (!optionSource || !previousOptionSource || optionSource === previousOptionSource) {
-            return;
-        }
-
-        const now = Date.now();
-        if (now - changeWindowStartRef.current > 2000) {
-            changeWindowStartRef.current = now;
-            changeCountRef.current = 0;
-        }
-
-        changeCountRef.current += 1;
-        if (changeCountRef.current === 5) {
-            console.warn(
-                "SuperSelect: the optionSource prop changed identity 5 times within 2 seconds. " +
-                    "Each new option source discards cached options and fetches again. " +
-                    "If the source is created during render, keep one instance across renders with the useOptionSource hook or useMemo.",
-            );
-        }
-    });
-}
-
 function createFallbackChildren(children: React.ReactNode, staticOptions: Option[], asyncOptions: Option[]): React.ReactNode {
     if (asyncOptions.length === 0) {
         return children;
@@ -678,4 +639,43 @@ function createPendingOptionsState(loadKey: OptionLoadKey): OptionLoadState {
         ...PENDING_OPTIONS_STATE,
         loadKey,
     };
+}
+
+declare const process: { env: { NODE_ENV?: string } };
+
+/**
+ * Warns in development when the optionSource prop looks like it is recreated on every render,
+ * which discards cached options and repeats fetch requests.
+ */
+function useOptionSourceIdentityWarning(optionSource: OptionSourceLike | undefined) {
+    const previousOptionSourceRef = useRef(optionSource);
+    const changeCountRef = useRef(0);
+    const changeWindowStartRef = useRef(0);
+
+    useEffect(() => {
+        if (process.env.NODE_ENV === "production") {
+            return;
+        }
+
+        const previousOptionSource = previousOptionSourceRef.current;
+        previousOptionSourceRef.current = optionSource;
+        if (!optionSource || !previousOptionSource || optionSource === previousOptionSource) {
+            return;
+        }
+
+        const now = Date.now();
+        if (now - changeWindowStartRef.current > 2000) {
+            changeWindowStartRef.current = now;
+            changeCountRef.current = 0;
+        }
+
+        changeCountRef.current += 1;
+        if (changeCountRef.current === 5) {
+            console.warn(
+                "SuperSelect: the optionSource prop changed identity 5 times within 2 seconds. " +
+                    "Each new option source discards cached options and fetches again. " +
+                    "If the source is created during render, keep one instance across renders with the useOptionSource hook or useMemo.",
+            );
+        }
+    });
 }
