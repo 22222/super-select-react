@@ -641,7 +641,7 @@ function createPendingOptionsState(loadKey: OptionLoadKey): OptionLoadState {
     };
 }
 
-declare const process: { env: { NODE_ENV?: string } };
+declare const process: { env?: { NODE_ENV?: string } } | undefined;
 
 /**
  * Warns in development when the optionSource prop looks like it is recreated on every render,
@@ -653,7 +653,8 @@ function useOptionSourceIdentityWarning(optionSource: OptionSourceLike | undefin
     const changeWindowStartRef = useRef(0);
 
     useEffect(() => {
-        if (process.env.NODE_ENV === "production") {
+        const isProduction = typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production";
+        if (isProduction) {
             return;
         }
 

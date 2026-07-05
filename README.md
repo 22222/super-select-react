@@ -64,7 +64,7 @@ If your options come from an API or other data source, pass an `optionSource`.
 ```tsx
 import { SuperSelect, useOptionSource } from "super-select-react";
 
-export function PersonSourceField() {
+export function PersonSelect() {
     const peopleSource = useOptionSource(async ({ values, search = "", offset = 0, limit = 100, signal }) => {
         const query = values
             ? values.map((value) => `ids=${encodeURIComponent(value)}`).join("&")

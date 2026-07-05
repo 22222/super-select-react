@@ -167,7 +167,9 @@ function UseOptionSourceDepsReset() {
     const optionSource = useOptionSource(
         async () => ({
             options:
-                group === "first" ? [{ value: "first-alpha", label: "First Alpha" }] : [{ value: "second-charlie", label: "Second Charlie" }],
+                group === "first"
+                    ? [{ value: "first-alpha", label: "First Alpha" }]
+                    : [{ value: "second-charlie", label: "Second Charlie" }],
             hasMore: false,
         }),
         [group],
